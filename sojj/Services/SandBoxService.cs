@@ -180,8 +180,8 @@ namespace Sojj.Services
                                 Max = 10240,
                             },
                         },
-                        CpuLimit = testCase.TimeLimit * Constants.NanoSecondInSecond,
-                        MemoryLimit = testCase.MemoryLimit * Constants.ByteInKiloByte,
+                        CpuLimit = testCase.TimeLimit,
+                        MemoryLimit = testCase.MemoryLimit,
                         ProcessLimit = 50,
                         CopyIn = new Dictionary<string, SandboxFile>
                         {
@@ -316,8 +316,8 @@ namespace Sojj.Services
                                 Max = 10240,
                             },
                         },
-                        CpuLimit = testCase.TimeLimit * Constants.NanoSecondInSecond,
-                        MemoryLimit = testCase.MemoryLimit * Constants.ByteInKiloByte,
+                        CpuLimit = testCase.TimeLimit,
+                        MemoryLimit = testCase.MemoryLimit,
                         ProcessLimit = 50,
                         CopyIn = new Dictionary<string, SandboxFile>
                         {

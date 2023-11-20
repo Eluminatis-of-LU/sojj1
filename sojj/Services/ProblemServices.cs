@@ -45,7 +45,7 @@ namespace Sojj.Services
                     CaseNumber = line,
                     Input = await File.ReadAllTextAsync(Path.Combine(inputPath, splitted[0])),
                     Output = await File.ReadAllTextAsync(Path.Combine(outputPath, splitted[1])),
-                    TimeLimit = long.Parse(splitted[2]) * Constants.NanoSecondInSecond,
+                    TimeLimit = long.Parse(splitted[2]) * Constants.NanoSecondInMillisecond,
                     Score = int.Parse(splitted[3]),
                     MemoryLimit = long.Parse(splitted[4]) * Constants.ByteInKiloByte,
                     TotalCase = testCases,
