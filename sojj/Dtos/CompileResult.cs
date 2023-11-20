@@ -8,7 +8,7 @@ namespace Sojj.Dtos
 {
     public class CompileResult
     {
-        public string Status { get; set; }
+        public JudgeStatus Status { get; set; }
 
         public string Message { get; set; }
 
@@ -19,5 +19,7 @@ namespace Sojj.Dtos
         public string OutputFileId { get; set; }
 
         public string[] ExecuteArgs { get; set; }
+
+        public string OutputFile { get; set; }
     }
 }

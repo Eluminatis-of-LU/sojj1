@@ -49,7 +49,7 @@ namespace Sojj.Dtos
         public int? CopyOutMax { get; set; }
     }
 
-    [JsonDerivedType(typeof(SandboxMemoryFie), "content")]
+    [JsonDerivedType(typeof(SandboxMemoryFile), "content")]
     [JsonDerivedType(typeof(SandboxLocalFile), "src")]
     [JsonDerivedType(typeof(SandboxPreparedFile), "fileId")]
     [JsonDerivedType(typeof(SandboxCollectorFile), "name")]
@@ -58,7 +58,7 @@ namespace Sojj.Dtos
     { 
     }
 
-    public class SandboxMemoryFie : SandboxFile
+    public class SandboxMemoryFile : SandboxFile
     {
         [JsonPropertyName("content")]
         public string Content { get; set; }

@@ -24,6 +24,7 @@
     "type": "compiler",
     "compile": "python3 -c \"import py_compile; py_compile.compile('foo.py', 'foo.pyc', doraise=True)\"",
     "codeFile": "foo.py",
+    "outputFile": "foo.pyc",
     "execute": "python3 foo.pyc"
   },
   "js": {
@@ -35,6 +36,7 @@
     "type": "compiler",
     "compile": "csc -optimize+ -out:foo.exe foo.cs",
     "codeFile": "foo.cs",
+    "outputFile": "foo.exe",
     "execute": "mono foo.exe"
   }
 }

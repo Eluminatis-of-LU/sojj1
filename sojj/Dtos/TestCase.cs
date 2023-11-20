@@ -20,5 +20,6 @@ namespace Sojj.Dtos
 
         public long MemoryLimit { get; set; }
         public int TotalCase { get; set; }
+        public bool CustomValidator { get; internal set; }
     }
 }
