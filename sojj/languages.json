@@ -1,42 +1,42 @@
 {
   "c": {
     "type": "compiler",
-    "compile": "/usr/bin/gcc -Wall --std=c99 -o foo foo.c -lm",
+    "compile": ["/usr/bin/gcc", "-Wall", "--std=c99", "-o", "foo", "foo.c", "-lm"],
     "codeFile": "foo.c",
     "outputFile": "foo",
-    "execute": "foo"
+    "execute": ["foo"]
   },
   "cc": {
     "type": "compiler",
-    "compile": "g++ -O2 -Wall -std=c++17 -o foo foo.cc -lm",
+    "compile": ["/usr/bin/g++", "-O2", "-Wall", "-std=c++17", "-o", "foo", "foo.cc", "-lm"],
     "codeFile": "foo.cc",
     "outputFile": "foo",
-    "execute": "foo"
+    "execute": ["foo"]
   },
   "java": {
     "type": "compiler",
-    "compile": "javac -d /out -encoding UTF-8 Main.java",
+    "compile": ["javac", "-encoding", "UTF-8", "Main.java"],
     "codeFile": "Main.java",
-    "outputFile": "Main",
-    "execute": "java -Dfile.encoding=UTF-8 Main"
+    "outputFile": "Main.class",
+    "execute": ["java", "-Dfile.encoding=UTF-8", "Main"]
   },
   "py3": {
     "type": "compiler",
-    "compile": "python3 -c \"import py_compile; py_compile.compile('foo.py', 'foo.pyc', doraise=True)\"",
+    "compile": ["python3", "-c", "import py_compile; py_compile.compile('foo.py', 'foo.pyc', doraise=True)"],
     "codeFile": "foo.py",
     "outputFile": "foo.pyc",
-    "execute": "python3 foo.pyc"
+    "execute": ["python3", "foo.pyc"]
   },
   "js": {
     "type": "interpreter",
     "codeFile": "foo.js",
-    "execute": "jsc foo.js"
+    "execute": ["jsc", "foo.js"]
   },
   "cs": {
     "type": "compiler",
-    "compile": "csc -optimize+ -out:foo.exe foo.cs",
+    "compile":  ["csc", "-optimize+", "-out:foo.exe", "foo.cs"],
     "codeFile": "foo.cs",
     "outputFile": "foo.exe",
-    "execute": "mono foo.exe"
+    "execute": ["mono", "foo.exe"]
   }
 }

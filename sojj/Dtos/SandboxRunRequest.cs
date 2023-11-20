@@ -30,7 +30,7 @@ namespace Sojj.Dtos
         [JsonPropertyName("memoryLimit")]
         public long? MemoryLimit { get; set; }
 
-        [JsonPropertyName("processLimit")]
+        [JsonPropertyName("procLimit")]
         public int? ProcessLimit { get; set; }
 
         [JsonPropertyName("copyIn")]

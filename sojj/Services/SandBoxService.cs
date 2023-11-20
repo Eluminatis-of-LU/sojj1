@@ -74,7 +74,7 @@ namespace Sojj.Services
                 {
                     new Command
                     {
-                        Args = languageInfo.Compile.Split(' '),
+                        Args = languageInfo.Compile,
                         Env = new string[] {"PATH=/usr/bin:/bin"},
                         Files = new SandboxFile[]
                         {
@@ -145,7 +145,7 @@ namespace Sojj.Services
             {
                 Status = JudgeStatus.STATUS_ACCEPTED,
                 Message = compileResult.Files[Constants.Stdout],
-                ExecuteArgs = languageInfo.Execute.Split(' '),
+                ExecuteArgs = languageInfo.Execute,
                 Language = language,
                 RunId = runId,
                 OutputFileId = compileResult.FileIds[languageInfo.OutputFile],
@@ -297,7 +297,7 @@ namespace Sojj.Services
                 {
                     new Command
                     {
-                        Args = languageInfo.Execute.Split(' '),
+                        Args = languageInfo.Execute,
                         Env = new string[] {"PATH=/usr/bin:/bin"},
                         Files = new SandboxFile[]
                         {
