@@ -54,7 +54,7 @@ namespace Sojj
                 Constants.Judging => JudgeStatus.STATUS_JUDGING,
                 Constants.Compiling => JudgeStatus.STATUS_COMPILING,
                 Constants.InterpretedLanguage => JudgeStatus.STATUS_INTEPRETED_LANGUAGE,
-                Constants.NonzeroExitStatus => JudgeStatus.STATUS_SYSTEM_ERROR,
+                Constants.NonzeroExitStatus => JudgeStatus.STATUS_RUNTIME_ERROR,
                 Constants.FileError => JudgeStatus.STATUS_SYSTEM_ERROR,
                 Constants.Signalled => JudgeStatus.STATUS_SYSTEM_ERROR,
                 Constants.InternalError => JudgeStatus.STATUS_SYSTEM_ERROR,
