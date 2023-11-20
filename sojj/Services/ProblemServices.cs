@@ -23,6 +23,7 @@ namespace Sojj.Services
         public async IAsyncEnumerable<TestCase> GetTestCasesAsync(string problemId, string domainId)
         {
             string path = Path.Combine(this.cacheLocation, domainId, problemId);
+            this.logger.LogInformation("Get test cases for problem {problemId} in domain {domainId} from {path}", problemId, domainId, path);
             if (!Directory.Exists(path))
             {
                 throw new DirectoryNotFoundException($"Problem {problemId} not found");

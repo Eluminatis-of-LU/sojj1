@@ -89,7 +89,7 @@ namespace Sojj.Services
                                 Max = 10240,
                             },
                         },
-                        CpuLimit = 1 * Constants.NanoSecondInSecond,
+                        CpuLimit = 15 * Constants.NanoSecondInSecond,
                         MemoryLimit = 1024 * 1024 * 1024,
                         ProcessLimit = 50,
                         CopyIn = new Dictionary<string, SandboxFile>
