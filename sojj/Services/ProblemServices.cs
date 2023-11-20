@@ -20,6 +20,7 @@ namespace Sojj.Services
             this.configuration = configuration;
             this.cacheLocation = this.configuration["JudgeService:CacheLocation"] ?? throw new ArgumentNullException("CacheLocation");
         }
+
         public async IAsyncEnumerable<TestCase> GetTestCasesAsync(string problemId, string domainId)
         {
             string path = Path.Combine(this.cacheLocation, domainId, problemId);

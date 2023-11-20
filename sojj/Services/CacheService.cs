@@ -23,6 +23,7 @@ namespace Sojj.Services
 
         public async Task<int> GetCacheUpdateTimeAsync()
         {
+            this.logger.LogInformation("Get cache update time");
             string fileName = Path.Combine(this.cacheLocation, "cache.txt");
             Directory.CreateDirectory(this.cacheLocation);
             if (!File.Exists(fileName))
@@ -33,6 +34,7 @@ namespace Sojj.Services
             string content = await File.ReadAllTextAsync(fileName);
             if (int.TryParse(content, out int lastUpdateAt))
             {
+                this.logger.LogInformation("Cache last update at {lastUpdateAt}", lastUpdateAt);
                 return lastUpdateAt;
             }
 
@@ -41,6 +43,7 @@ namespace Sojj.Services
 
         public Task InvalidateCacheAsync()
         {
+            this.logger.LogInformation("Invalidate cache");
             Directory.CreateDirectory(this.cacheLocation);
             Directory.Delete(this.cacheLocation, true);
             return Task.CompletedTask;
@@ -48,9 +51,12 @@ namespace Sojj.Services
 
         public async Task WriteCacheAsync(ZipArchive zipData, string domainId, string problemId, int unixTimestamp)
         {
+            this.logger.LogInformation("Write cache for problem {problemId} in domain {domainId}", problemId, domainId);
             string path = Path.Combine(this.cacheLocation, domainId, problemId);
+            this.logger.LogInformation("Write cache to {path}", path);
             Directory.CreateDirectory(path);
             zipData.ExtractToDirectory(path, true);
+            this.logger.LogInformation("Write cache to {path} completed", path);
             await File.WriteAllTextAsync(Path.Combine(this.cacheLocation, "cache.txt"), unixTimestamp.ToString());
         }
     }
