@@ -25,5 +25,8 @@ namespace Sojj
         public const string Judging = "Judging";
         public const string Compiling = "Compiling";
         public const string NonzeroExitStatus = "Nonzero Exit Status";
+        public const string FileError = "File Error";
+        public const string Signalled = "Signalled";
+        public const string InternalError = "Internal Error";
     }
 }
