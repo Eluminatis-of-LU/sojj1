@@ -29,6 +29,8 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await this.cacheService.InvalidateCacheAsync();
+
         await this.UpdateProblemDataAsync();
 
         while (!stoppingToken.IsCancellationRequested)
@@ -189,7 +191,7 @@ public class Worker : BackgroundService
     {
         await this.judgeService.EnsureLoggedinAsync();
         int lastUpdateAt = await this.cacheService.GetCacheUpdateTimeAsync();
-        var dataList = await this.judgeService.GetDataListAsync(0);
+        var dataList = await this.judgeService.GetDataListAsync(lastUpdateAt);
         foreach (var problem in dataList.Problems)
         {
             this.logger.LogInformation($"Problem {problem.ProblemId} updated at {problem.DomainId}");
@@ -200,7 +202,7 @@ public class Worker : BackgroundService
                 continue;
             }
 
-            await this.cacheService.InvalidateCacheAsync();
+            await this.cacheService.InvalidateCacheAsync(problem.DomainId, problem.ProblemId.ToString());
 
             await this.cacheService.WriteCacheAsync(zipData, problem.DomainId, problem.ProblemId.ToString(), dataList.UnixTimestamp);
         }

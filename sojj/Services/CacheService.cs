@@ -49,13 +49,22 @@ namespace Sojj.Services
             return Task.CompletedTask;
         }
 
+        public Task InvalidateCacheAsync(string domainId, string problemId)
+        {
+            this.logger.LogInformation("Invalidate cache {domainId}-{problemId}", domainId, problemId);
+            string path = Path.Combine(this.cacheLocation, domainId, problemId);
+            Directory.CreateDirectory(path);
+            Directory.Delete(path, true);
+            return Task.CompletedTask;
+        }
+
         public async Task WriteCacheAsync(ZipArchive zipData, string domainId, string problemId, int unixTimestamp)
         {
             this.logger.LogInformation("Write cache for problem {problemId} in domain {domainId}", problemId, domainId);
             string path = Path.Combine(this.cacheLocation, domainId, problemId);
             this.logger.LogInformation("Write cache to {path}", path);
             Directory.CreateDirectory(path);
-            zipData.ExtractToDirectory(path, true);
+            zipData.ExtractToDirectory(path, false);
             this.logger.LogInformation("Write cache to {path} completed", path);
             await File.WriteAllTextAsync(Path.Combine(this.cacheLocation, "cache.txt"), unixTimestamp.ToString());
         }

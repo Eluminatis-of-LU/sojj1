@@ -11,7 +11,10 @@ namespace Sojj.Services.Abstractions
     {
         Task InvalidateCacheAsync();
 
+        Task InvalidateCacheAsync(string domainId, string problemId);
+
         Task<int> GetCacheUpdateTimeAsync();
+
         Task WriteCacheAsync(ZipArchive zipData, string domainId, string problemId, int unixTimestamp);
     }
 }
