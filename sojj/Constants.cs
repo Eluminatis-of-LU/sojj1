@@ -24,5 +24,6 @@ namespace Sojj
         public const long NanoSecondInSecond = 1000000000;
         public const string Judging = "Judging";
         public const string Compiling = "Compiling";
+        public const string NonzeroExitStatus = "Nonzero Exit Status";
     }
 }

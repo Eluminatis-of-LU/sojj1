@@ -54,6 +54,7 @@ namespace Sojj
                 Constants.Judging => JudgeStatus.STATUS_JUDGING,
                 Constants.Compiling => JudgeStatus.STATUS_COMPILING,
                 Constants.InterpretedLanguage => JudgeStatus.STATUS_INTEPRETED_LANGUAGE,
+                Constants.NonzeroExitStatus => JudgeStatus.STATUS_SYSTEM_ERROR,
                 _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
             };
         }   
