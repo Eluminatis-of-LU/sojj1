@@ -37,6 +37,6 @@ RUN apt-get update && \
 COPY ./entrypoint.sh /root/entrypoint.sh
 RUN chmod +x /root/entrypoint.sh
 
-EXPOSE 5050/tcp 5051/tcp
+EXPOSE 5050/tcp
 
 ENTRYPOINT [ "/root/entrypoint.sh" ]

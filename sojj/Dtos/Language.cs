@@ -13,7 +13,7 @@ namespace Sojj.Dtos
         public string Type { get; set; }
 
         [JsonPropertyName("compile")]
-        public string Compile { get; set; }
+        public string[]? Compile { get; set; }
 
         [JsonPropertyName("codeFile")]
         public string CodeFile { get; set; }
@@ -22,6 +22,6 @@ namespace Sojj.Dtos
         public string OutputFile { get; set; }
 
         [JsonPropertyName("execute")]
-        public string Execute { get; set; }
+        public string[]? Execute { get; set; }
     }
 }
