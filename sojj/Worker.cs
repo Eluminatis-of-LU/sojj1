@@ -59,11 +59,11 @@ public class Worker : BackgroundService
                     continue;
                 }
 
-                await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new 
+                await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new JudgeProcessResponse
                 {
-                    key = "next",
-                    tag = messageDto.Tag,
-                    status = JudgeStatus.STATUS_COMPILING,
+                    Key = "next",
+                    Tag = messageDto.Tag,
+                    Status = JudgeStatus.STATUS_COMPILING,
                 })), WebSocketMessageType.Text, true, stoppingToken);
                 var compileResult = await this.sandboxService.CompileAsync(messageDto.Code, messageDto.RunId, messageDto.Language);
                 if (compileResult.Status == JudgeStatus.STATUS_ACCEPTED)
@@ -78,21 +78,22 @@ public class Worker : BackgroundService
                         
                         var testCaseResult = await this.sandboxService.RunAsync(testCase, compileResult);
 
-                        await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new
+                        var testCaseResponse = new JudgeProcessResponse
                         {
-                            key = "next",
-                            tag = messageDto.Tag,
-                            status = JudgeStatus.STATUS_JUDGING,
-                            Case = new
+                            Key = "next",
+                            Tag = messageDto.Tag,
+                            Status = JudgeStatus.STATUS_JUDGING,
+                            Case = new JudgeProcessResponseCase
                             {
-                                status = testCaseResult.Status,
-                                score = testCaseResult.Score,
-                                time_ms = testCaseResult.TimeInNs / 1000000.0f,
-                                memory_kb = testCaseResult.MemoryInByte / 1024.0f,
-                                judge_text = testCaseResult.Message,
+                                Status = testCaseResult.Status,
+                                Score = testCaseResult.Score,
+                                TimeInMilliseconds = testCaseResult.TimeInNs / 1000000.0f,
+                                MemoryInKiloBytes = testCaseResult.MemoryInByte / 1024.0f,
+                                JudgeText = testCaseResult.Message,
                             },
-                            progress = ((testCase.CaseNumber + 1) * 100.0f / testCase.TotalCase),
-                        })), WebSocketMessageType.Text, true, stoppingToken);
+                        };
+
+                        await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(testCaseResponse)), WebSocketMessageType.Text, true, stoppingToken);
 
                         totalScore += testCaseResult.Score;
                         problemStatus = Math.Max(problemStatus, (int)testCaseResult.Status);
@@ -100,15 +101,17 @@ public class Worker : BackgroundService
                         totalTime = Math.Max(totalTime, testCaseResult.TimeInNs);
                     }
 
-                    await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new
+                    var judgeProcessResponse = new JudgeProcessResponse
                     {
-                        key = "end",
-                        tag = messageDto.Tag,
-                        status = problemStatus,
-                        score = totalScore,
-                        time_ms = totalTime / 1000000.0f,
-                        memory_kb = totalMemory / 1024.0f,
-                    })), WebSocketMessageType.Text, true, stoppingToken);
+                        Key = "end",
+                        Tag = messageDto.Tag,
+                        Status = (JudgeStatus)problemStatus,
+                        Score = totalScore,
+                        TimeInMilliseconds = totalTime / 1000000.0f,
+                        MemoryInKiloBytes = totalMemory / 1024.0f,
+                    };
+
+                    await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(judgeProcessResponse)), WebSocketMessageType.Text, true, stoppingToken);
 
                     this.logger.LogInformation("Procesed Compiled language for {runId} {language} {problemId} {domainId}",
                                                messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId);
@@ -125,21 +128,22 @@ public class Worker : BackgroundService
 
                         var testCaseResult = await this.sandboxService.RunInterpreterAsync(testCase, messageDto.Code, messageDto.RunId, messageDto.Language);
 
-                        await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new
+                        var testCaseResponse = new JudgeProcessResponse
                         {
-                            key = "next",
-                            tag = messageDto.Tag,
-                            status = JudgeStatus.STATUS_JUDGING,
-                            Case = new
+                            Key = "next",
+                            Tag = messageDto.Tag,
+                            Status = JudgeStatus.STATUS_JUDGING,
+                            Case = new JudgeProcessResponseCase
                             {
-                                status = testCaseResult.Status,
-                                score = testCaseResult.Score,
-                                time_ms = testCaseResult.TimeInNs / 1000000.0f,
-                                memory_kb = testCaseResult.MemoryInByte / 1024.0f,
-                                judge_text = testCaseResult.Message,
+                                Status = testCaseResult.Status,
+                                Score = testCaseResult.Score,
+                                TimeInMilliseconds = testCaseResult.TimeInNs / 1000000.0f,
+                                MemoryInKiloBytes = testCaseResult.MemoryInByte / 1024.0f,
+                                JudgeText = testCaseResult.Message,
                             },
-                            progress = ((testCase.CaseNumber + 1) * 100.0f / testCase.TotalCase),
-                        })), WebSocketMessageType.Text, true, stoppingToken);
+                        };
+
+                        await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(testCaseResponse)), WebSocketMessageType.Text, true, stoppingToken);
 
                         totalScore += testCaseResult.Score;
                         problemStatus = Math.Max(problemStatus, (int)testCaseResult.Status);
@@ -147,29 +151,31 @@ public class Worker : BackgroundService
                         totalTime = Math.Max(totalTime, testCaseResult.TimeInNs);
                     }
 
-                    await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new
+                    var judgeProcessResponse = new JudgeProcessResponse
                     {
-                        key = "end",
-                        tag = messageDto.Tag,
-                        status = problemStatus,
-                        score = totalScore,
-                        time_ms = totalTime / 1000000.0f,
-                        memory_kb = totalMemory / 1024.0f,
-                    })), WebSocketMessageType.Text, true, stoppingToken);
+                        Key = "end",
+                        Tag = messageDto.Tag,
+                        Status = (JudgeStatus)problemStatus,
+                        Score = totalScore,
+                        TimeInMilliseconds = totalTime / 1000000.0f,
+                        MemoryInKiloBytes = totalMemory / 1024.0f,
+                    };
+
+                    await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(judgeProcessResponse)), WebSocketMessageType.Text, true, stoppingToken);
 
                     this.logger.LogInformation("Procesed Interpreted language for {runId} {language} {problemId} {domainId}",
                                                messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId);
                 }
                 else
                 {
-                    await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new
+                    await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new JudgeProcessResponse
                     {
-                        key = "end",
-                        tag = messageDto.Tag,
-                        status = JudgeStatus.STATUS_COMPILE_ERROR,
-                        score = 0,
-                        time_ms = 0,
-                        memory_kb = 0,
+                        Key = "end",
+                        Tag = messageDto.Tag,
+                        Status = JudgeStatus.STATUS_COMPILE_ERROR,
+                        Score = 0,
+                        TimeInMilliseconds = 0,
+                        MemoryInKiloBytes = 0,
                     })), WebSocketMessageType.Text, true, stoppingToken);
 
                     this.logger.LogInformation("Compile error for {runId} {language} {problemId} {domainId}",
