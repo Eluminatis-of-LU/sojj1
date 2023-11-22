@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Sojj.Services
@@ -30,25 +31,25 @@ namespace Sojj.Services
                 throw new DirectoryNotFoundException($"Problem {problemId} not found");
             }
 
-            var config = await File.ReadAllLinesAsync(Path.Combine(path, "Config.ini"));
+            var config = await File.ReadAllTextAsync(Path.Combine(path, "Config.json"));
+
+            var testCaseConfig = JsonSerializer.Deserialize<TestCaseConfig>(config);
 
             string inputPath = Path.Combine(path, "Input");
             string outputPath = Path.Combine(path, "Output");
 
-            int testCases = int.Parse(config[0]);
-
-            for (int line = 1; line <= testCases; line++)
+            for (int caseNumber = 0; caseNumber < testCaseConfig.TestCases.Length; caseNumber++)
             {
-                var splitted = config[line].Split('|');
                 yield return new TestCase
                 {
-                    CaseNumber = line,
-                    Input = await File.ReadAllTextAsync(Path.Combine(inputPath, splitted[0])),
-                    Output = await File.ReadAllTextAsync(Path.Combine(outputPath, splitted[1])),
-                    TimeLimit = long.Parse(splitted[2]) * Constants.NanoSecondInMillisecond,
-                    Score = int.Parse(splitted[3]),
-                    MemoryLimit = long.Parse(splitted[4]) * Constants.ByteInKiloByte,
-                    TotalCase = testCases,
+                    CaseNumber = caseNumber,
+                    Input = await File.ReadAllTextAsync(Path.Combine(inputPath, testCaseConfig.TestCases[caseNumber].Input)),
+                    Output = await File.ReadAllTextAsync(Path.Combine(outputPath, testCaseConfig.TestCases[caseNumber].Output)),
+                    TimeLimit = testCaseConfig.TimeLimit * Constants.NanoSecondInMillisecond,
+                    Score = testCaseConfig.TestCases[caseNumber].Score,
+                    MemoryLimit = testCaseConfig.MemoryLimit * Constants.ByteInKiloByte,
+                    TotalCase = testCaseConfig.TestCases.Length,
+                    ValidatorType = testCaseConfig.ValidatorType,
                 };
             }
         }

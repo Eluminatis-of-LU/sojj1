@@ -241,7 +241,7 @@ namespace Sojj.Services
 
             this.logger.LogInformation("Run success");
 
-            if (!testCase.CustomValidator)
+            if (testCase.ValidatorType == ValidatorType.FileValidator)
             {
                 var expectedOutput = testCase.Output.Trim();
                 var actualOutput = runResult.Files[Constants.Stdout].Trim();
@@ -377,7 +377,7 @@ namespace Sojj.Services
 
             this.logger.LogInformation("Run success");
 
-            if (!testCase.CustomValidator)
+            if (testCase.ValidatorType == ValidatorType.FileValidator)
             {
                 var expectedOutput = testCase.Output.Trim();
                 var actualOutput = runResult.Files[Constants.Stdout].Trim();
