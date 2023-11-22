@@ -101,7 +101,8 @@ namespace Sojj.Services
                     }
                 },
             };
-            this.logger.LogInformation("Compile request: {request}", JsonSerializer.Serialize(request));
+            this.logger.LogDebug("Compile request: {request}", JsonSerializer.Serialize(request));
+            this.logger.LogInformation("Compiling {runId}", runId);
             var response = await this.httpClient.PostAsJsonAsync("/run", request);
 
             if (!response.IsSuccessStatusCode)
@@ -115,7 +116,10 @@ namespace Sojj.Services
             }
             
             var content = await response.Content.ReadAsStringAsync();
-            this.logger.LogInformation("Compile result: {content}", content);
+            
+            this.logger.LogDebug("Compile result: {content}", content);
+
+            this.logger.LogInformation("Compiling {runId} done", runId);
             var result = JsonSerializer.Deserialize<SandboxRunResult[]>(content);
             if (result == null || result.Length != 1)
             {
@@ -192,7 +196,9 @@ namespace Sojj.Services
                 },
             };
 
-            this.logger.LogInformation("Run request: {request}", JsonSerializer.Serialize(request));
+            this.logger.LogDebug("Run request: {request}", JsonSerializer.Serialize(request));
+
+            this.logger.LogInformation("Running test case {testCase.CaseNumber}", testCase.CaseNumber);
 
             var response = await this.httpClient.PostAsJsonAsync("/run", request);
 
@@ -209,7 +215,9 @@ namespace Sojj.Services
 
             var content = await response.Content.ReadAsStringAsync();
 
-            this.logger.LogInformation("Run result: {content}", content);
+            this.logger.LogDebug("Run result: {content}", content);
+
+            this.logger.LogInformation("Running finished test case {testCase.CaseNumber} done", testCase.CaseNumber);
 
             var result = JsonSerializer.Deserialize<SandboxRunResult[]>(content);
 
@@ -328,7 +336,9 @@ namespace Sojj.Services
                 },
             };
 
-            this.logger.LogInformation("Run request: {request}", JsonSerializer.Serialize(request));
+            this.logger.LogDebug("Run request: {request}", JsonSerializer.Serialize(request));
+
+            this.logger.LogInformation("Running test case {testCase.CaseNumber}", testCase.CaseNumber);
 
             var response = await this.httpClient.PostAsJsonAsync("/run", request);
 
@@ -345,7 +355,9 @@ namespace Sojj.Services
 
             var content = await response.Content.ReadAsStringAsync();
 
-            this.logger.LogInformation("Run result: {content}", content);
+            this.logger.LogDebug("Run result: {content}", content);
+
+            this.logger.LogInformation("Running finished test case {testCase.CaseNumber} done", testCase.CaseNumber);
 
             var result = JsonSerializer.Deserialize<SandboxRunResult[]>(content);
 
