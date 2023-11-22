@@ -109,8 +109,11 @@ public class Worker : BackgroundService
                         time_ms = totalTime / 1000000.0f,
                         memory_kb = totalMemory / 1024.0f,
                     })), WebSocketMessageType.Text, true, stoppingToken);
+
+                    this.logger.LogInformation("Procesed Compiled language for {runId} {language} {problemId} {domainId}",
+                                               messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId);
                 }
-                else if (compileResult.Status == JudgeStatus.STATUS_INTEPRETED_LANGUAGE)
+                else if (compileResult.Status == JudgeStatus.STATUS_INTERPRETED_LANGUAGE)
                 {
                     int totalScore = 0;
                     int problemStatus = (int)JudgeStatus.STATUS_ACCEPTED;
@@ -153,6 +156,9 @@ public class Worker : BackgroundService
                         time_ms = totalTime / 1000000.0f,
                         memory_kb = totalMemory / 1024.0f,
                     })), WebSocketMessageType.Text, true, stoppingToken);
+
+                    this.logger.LogInformation("Procesed Interpreted language for {runId} {language} {problemId} {domainId}",
+                                               messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId);
                 }
                 else
                 {
@@ -165,6 +171,9 @@ public class Worker : BackgroundService
                         time_ms = 0,
                         memory_kb = 0,
                     })), WebSocketMessageType.Text, true, stoppingToken);
+
+                    this.logger.LogInformation("Compile error for {runId} {language} {problemId} {domainId}",
+                        messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId);
                 }
 
             }

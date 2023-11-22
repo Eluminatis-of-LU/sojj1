@@ -63,7 +63,7 @@ namespace Sojj.Services
                 this.logger.LogInformation("Language {language} is not a compile language", language);
                 return new CompileResult
                 {
-                    Status = JudgeStatus.STATUS_INTEPRETED_LANGUAGE,
+                    Status = JudgeStatus.STATUS_INTERPRETED_LANGUAGE,
                     Message = "Language is not a compiled language",
                 };
             }

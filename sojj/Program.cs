@@ -8,11 +8,12 @@ IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
         services.AddHostedService<Worker>();
-        services.AddHostedService<HeartBeatBackgroundService>();
         services.AddSingleton<IJudgeService, JudgeService>();
         services.AddSingleton<ICacheService, CacheService>();
         services.AddSingleton<IProblemService, ProblemServices>();
         services.AddSingleton<ISandboxService, SandboxService>();
+
+        services.AddApplicationInsightsTelemetryWorkerService();
     })
     .Build();
 
