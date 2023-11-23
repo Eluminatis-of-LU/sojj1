@@ -1,33 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
-namespace Sojj.Dtos
+namespace Sojj.Dtos;
+
+public class SandboxRunResult
 {
-    public class SandboxRunResult
-    {
-        [JsonPropertyName("status")]
-        public string Status { get; set; }
+    [JsonPropertyName("status")]
+    public string Status { get; set; }
 
-        [JsonPropertyName("exitStatus")]
-        public int ExitStatus { get; set; }
+    [JsonPropertyName("exitStatus")]
+    public int ExitStatus { get; set; }
 
-        [JsonPropertyName("time")]
-        public int Time { get; set; }
+    [JsonPropertyName("time")]
+    public int Time { get; set; }
 
-        [JsonPropertyName("memory")]
-        public long Memory { get; set; }
+    [JsonPropertyName("memory")]
+    public long Memory { get; set; }
 
-        [JsonPropertyName("runTime")]
-        public long RunTime { get; set; }
+    [JsonPropertyName("runTime")]
+    public long RunTime { get; set; }
 
-        [JsonPropertyName("files")]
-        public Dictionary<string, string> Files { get; set; }
+    [JsonPropertyName("files")]
+    public Dictionary<string, string> Files { get; set; }
 
-        [JsonPropertyName("fileIds")]
-        public Dictionary<string, string> FileIds { get; set; }
-    }
+    [JsonPropertyName("fileIds")]
+    public Dictionary<string, string> FileIds { get; set; }
 }

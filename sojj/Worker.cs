@@ -1,10 +1,8 @@
 using Sojj.Dtos;
 using Sojj.Services.Abstractions;
-using System;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Sojj;
 
@@ -29,16 +27,16 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await this.cacheService.InvalidateCacheAsync();
+        await cacheService.InvalidateCacheAsync();
 
-        await this.UpdateProblemDataAsync();
+        await UpdateProblemDataAsync();
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            this.logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-            await this.judgeService.EnsureLoggedinAsync();
+            logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+            await judgeService.EnsureLoggedinAsync();
 
-            var ws = await this.judgeService.ConsumeWebSocketAsync(stoppingToken);
+            var ws = await judgeService.ConsumeWebSocketAsync(stoppingToken);
 
             var buffer = new byte[1024 * 4];
 
@@ -49,18 +47,18 @@ public class Worker : BackgroundService
                 {
                     await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, stoppingToken);
                 }
-                
+
                 var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
 
-                this.logger.LogInformation("Message received: {message}", message);
+                logger.LogInformation("Message received: {message}", message);
 
                 if (!TryParseMessageDto(message, out var messageDto))
                 {
-                    await this.UpdateProblemDataAsync();
+                    await UpdateProblemDataAsync();
                     continue;
                 }
 
-                await this.TryProcessMessageAsync(messageDto, ws, stoppingToken);
+                await TryProcessMessageAsync(messageDto, ws, stoppingToken);
             }
 
             await Task.Delay(1000, stoppingToken);
@@ -71,11 +69,11 @@ public class Worker : BackgroundService
     {
         try
         {
-            await this.ProcessMessageAsync(messageDto, ws, stoppingToken);
+            await ProcessMessageAsync(messageDto, ws, stoppingToken);
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Error processing for {runId} {language} {problemId} {domainId}",
+            logger.LogError(ex, "Error processing for {runId} {language} {problemId} {domainId}",
                 messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId);
 
             await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new JudgeProcessResponse
@@ -99,15 +97,15 @@ public class Worker : BackgroundService
             Status = JudgeStatus.STATUS_COMPILING,
         })), WebSocketMessageType.Text, true, stoppingToken);
 
-        var compileResult = await this.sandboxService.CompileAsync(messageDto.Code, messageDto.RunId, messageDto.Language);
+        var compileResult = await sandboxService.CompileAsync(messageDto.Code, messageDto.RunId, messageDto.Language);
 
         if (compileResult.Status == JudgeStatus.STATUS_ACCEPTED)
         {
-            await this.ProcessCompiledLanguageAsync(messageDto, ws, stoppingToken, compileResult);
+            await ProcessCompiledLanguageAsync(messageDto, ws, stoppingToken, compileResult);
         }
         else if (compileResult.Status == JudgeStatus.STATUS_INTERPRETED_LANGUAGE)
         {
-            await this.ProcessInterpretedLanguageAsync(messageDto, ws, stoppingToken);
+            await ProcessInterpretedLanguageAsync(messageDto, ws, stoppingToken);
         }
         else
         {
@@ -121,7 +119,7 @@ public class Worker : BackgroundService
                 MemoryInKiloBytes = 0,
             })), WebSocketMessageType.Text, true, stoppingToken);
 
-            this.logger.LogInformation("Compile error for {runId} {language} {problemId} {domainId}",
+            logger.LogInformation("Compile error for {runId} {language} {problemId} {domainId}",
                 messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId);
         }
     }
@@ -132,11 +130,11 @@ public class Worker : BackgroundService
         int problemStatus = (int)JudgeStatus.STATUS_ACCEPTED;
         long totalMemory = 0;
         long totalTime = 0;
-        await foreach (TestCase testCase in this.problemService.GetTestCasesAsync(messageDto.ProblemId.ToString(), messageDto.DomainId))
+        await foreach (TestCase testCase in problemService.GetTestCasesAsync(messageDto.ProblemId.ToString(), messageDto.DomainId))
         {
-            this.logger.LogInformation("Running test case {testCase.CaseNumber}", testCase.CaseNumber);
+            logger.LogInformation("Running test case {testCase.CaseNumber}", testCase.CaseNumber);
 
-            var testCaseResult = await this.sandboxService.RunInterpreterAsync(testCase, messageDto.Code, messageDto.RunId, messageDto.Language);
+            var testCaseResult = await sandboxService.RunInterpreterAsync(testCase, messageDto.Code, messageDto.RunId, messageDto.Language);
 
             var testCaseResponse = new JudgeProcessResponse
             {
@@ -173,7 +171,7 @@ public class Worker : BackgroundService
 
         await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(judgeProcessResponse)), WebSocketMessageType.Text, true, stoppingToken);
 
-        this.logger.LogInformation("Procesed Interpreted language for {runId} {language} {problemId} {domainId}",
+        logger.LogInformation("Procesed Interpreted language for {runId} {language} {problemId} {domainId}",
                                    messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId);
     }
 
@@ -183,11 +181,11 @@ public class Worker : BackgroundService
         int problemStatus = (int)JudgeStatus.STATUS_ACCEPTED;
         long totalMemory = 0;
         long totalTime = 0;
-        await foreach (TestCase testCase in this.problemService.GetTestCasesAsync(messageDto.ProblemId.ToString(), messageDto.DomainId))
+        await foreach (TestCase testCase in problemService.GetTestCasesAsync(messageDto.ProblemId.ToString(), messageDto.DomainId))
         {
-            this.logger.LogInformation("Running test case {testCase.CaseNumber}", testCase.CaseNumber);
+            logger.LogInformation("Running test case {testCase.CaseNumber}", testCase.CaseNumber);
 
-            var testCaseResult = await this.sandboxService.RunAsync(testCase, compileResult);
+            var testCaseResult = await sandboxService.RunAsync(testCase, compileResult);
 
             var testCaseResponse = new JudgeProcessResponse
             {
@@ -224,7 +222,7 @@ public class Worker : BackgroundService
 
         await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(judgeProcessResponse)), WebSocketMessageType.Text, true, stoppingToken);
 
-        this.logger.LogInformation("Procesed Compiled language for {runId} {language} {problemId} {domainId}",
+        logger.LogInformation("Procesed Compiled language for {runId} {language} {problemId} {domainId}",
                                    messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId);
     }
 
@@ -244,22 +242,22 @@ public class Worker : BackgroundService
 
     private async Task UpdateProblemDataAsync()
     {
-        await this.judgeService.EnsureLoggedinAsync();
-        int lastUpdateAt = await this.cacheService.GetCacheUpdateTimeAsync();
-        var dataList = await this.judgeService.GetDataListAsync(lastUpdateAt);
+        await judgeService.EnsureLoggedinAsync();
+        int lastUpdateAt = await cacheService.GetCacheUpdateTimeAsync();
+        var dataList = await judgeService.GetDataListAsync(lastUpdateAt);
         foreach (var problem in dataList.Problems)
         {
-            this.logger.LogInformation($"Problem {problem.ProblemId} updated at {problem.DomainId}");
-            var zipData = await this.judgeService.GetProblemDataAsync(problem.ProblemId, problem.DomainId);
+            logger.LogInformation($"Problem {problem.ProblemId} updated at {problem.DomainId}");
+            var zipData = await judgeService.GetProblemDataAsync(problem.ProblemId, problem.DomainId);
             if (zipData == null)
             {
-                this.logger.LogError("Problem data not found for {problemid}, {dommainId}", problem.ProblemId, problem.DomainId);
+                logger.LogError("Problem data not found for {problemid}, {dommainId}", problem.ProblemId, problem.DomainId);
                 continue;
             }
 
-            await this.cacheService.InvalidateCacheAsync(problem.DomainId, problem.ProblemId.ToString());
+            await cacheService.InvalidateCacheAsync(problem.DomainId, problem.ProblemId.ToString());
 
-            await this.cacheService.WriteCacheAsync(zipData, problem.DomainId, problem.ProblemId.ToString(), dataList.UnixTimestamp);
+            await cacheService.WriteCacheAsync(zipData, problem.DomainId, problem.ProblemId.ToString(), dataList.UnixTimestamp);
         }
     }
 }

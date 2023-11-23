@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
-namespace Sojj.Dtos
+namespace Sojj.Dtos;
+
+public class DataList
 {
-    public class DataList
-    {
-        [JsonPropertyName("pids")]
-        public Problem[] Problems { get; set; }
-        [JsonPropertyName("time")]
-        public  int UnixTimestamp { get; set; }
-    }
+    [JsonPropertyName("pids")]
+    public Problem[] Problems { get; set; }
+    [JsonPropertyName("time")]
+    public int UnixTimestamp { get; set; }
 }
+

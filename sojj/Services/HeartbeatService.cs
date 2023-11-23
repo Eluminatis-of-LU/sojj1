@@ -1,16 +1,12 @@
 ﻿using Sojj.Services.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading.Tasks;
+
+namespace Sojj.Services;
 
 public class HeartbeatService : BackgroundService
 {
-    private ILogger<HeartbeatService> logger;
-    private IJudgeService judgeService;
-    private ISandboxService sandboxService;
+    private readonly ILogger<HeartbeatService> logger;
+    private readonly IJudgeService judgeService;
+    private readonly ISandboxService sandboxService;
 
     public HeartbeatService(ILogger<HeartbeatService> logger, IJudgeService judgeService, ISandboxService sandboxService)
     {
@@ -23,11 +19,11 @@ public class HeartbeatService : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            this.logger.LogInformation("HeartbeatService running at: {time}", DateTimeOffset.Now);
+            logger.LogInformation("HeartbeatService running at: {time}", DateTimeOffset.Now);
 
-            await this.judgeService.EnsureLoggedinAsync();
+            await judgeService.EnsureLoggedinAsync();
 
-            await this.sandboxService.CheckHealthAsync();
+            await sandboxService.CheckHealthAsync();
 
             await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
         }

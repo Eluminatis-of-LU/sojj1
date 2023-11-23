@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO.Compression;
 
-namespace Sojj.Services.Abstractions
+namespace Sojj.Services.Abstractions;
+
+public interface ICacheService
 {
-    public interface ICacheService
-    {
-        Task InvalidateCacheAsync();
+    Task InvalidateCacheAsync();
 
-        Task InvalidateCacheAsync(string domainId, string problemId);
+    Task InvalidateCacheAsync(string domainId, string problemId);
 
-        Task<int> GetCacheUpdateTimeAsync();
+    Task<int> GetCacheUpdateTimeAsync();
 
-        Task WriteCacheAsync(ZipArchive zipData, string domainId, string problemId, int unixTimestamp);
-    }
+    Task WriteCacheAsync(ZipArchive zipData, string domainId, string problemId, int unixTimestamp);
 }
