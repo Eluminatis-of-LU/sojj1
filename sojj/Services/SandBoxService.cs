@@ -47,6 +47,21 @@ namespace Sojj.Services
             this.languages = JsonSerializer.Deserialize<Dictionary<string, Language>>(stream);
         }
 
+        public async Task CheckHealthAsync()
+        {
+            this.logger.LogInformation("Checking sandbox service health");
+
+            var response = await this.httpClient.GetAsync("/config");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                this.logger.LogError("Sandbox service is not healthy: {statusCode}", response.StatusCode);
+                throw new Exception("Sandbox service is not healthy");
+            }
+
+            this.logger.LogInformation("Sandbox service is healthy");
+        }
+
         public async Task<CompileResult> CompileAsync(string sourceCode, string runId, string language)
         {
             if (!this.languages.TryGetValue(language, out var languageInfo))
