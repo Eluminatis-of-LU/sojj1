@@ -15,6 +15,7 @@ public static class Constants
     public const string Stderr = "stderr";
     public const string Stdout = "stdout";
     public const long ByteInKiloByte = 1024;
+    public static long ByteInMegaByte = 1048576;
     public const long NanoSecondInSecond = 1000000000;
     public const long NanoSecondInMillisecond = 1000000;
     public const string Judging = "Judging";

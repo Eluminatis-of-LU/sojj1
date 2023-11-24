@@ -89,23 +89,23 @@ public class SandboxService : ISandboxService
                         {
                             new SandboxCollectorFile
                             {
-                                Name = "stdout",
-                                Max = 10240,
+                                Name = Constants.Stdout,
+                                Max = 4 * Constants.ByteInMegaByte,
                             },
                             new SandboxCollectorFile
                             {
-                                Name = "stderr",
-                                Max = 10240,
+                                Name = Constants.Stderr,
+                                Max = 4 * Constants.ByteInMegaByte,
                             },
                         },
                         CpuLimit = 15 * Constants.NanoSecondInSecond,
-                        MemoryLimit = 1024 * 1024 * 1024,
-                        ProcessLimit = 50,
+                        MemoryLimit = 256 * Constants.ByteInMegaByte,
+                        ProcessLimit = 10,
                         CopyIn = new Dictionary<string, SandboxFile>
                         {
                             { languageInfo.CodeFile, new SandboxMemoryFile { Content = sourceCode } },
                         },
-                        CopyOut = new string[] { "stdout", "stderr" },
+                        CopyOut = new string[] { Constants.Stdout, Constants.Stderr },
                         CopyOutCached = new string[] { languageInfo.CodeFile, languageInfo.OutputFile },
                     }
             },
@@ -184,23 +184,23 @@ public class SandboxService : ISandboxService
                             },
                             new SandboxCollectorFile
                             {
-                                Name = "stdout",
-                                Max = 10240,
+                                Name = Constants.Stdout,
+                                Max = 4 * Constants.ByteInMegaByte,
                             },
                             new SandboxCollectorFile
                             {
-                                Name = "stderr",
-                                Max = 10240,
+                                Name = Constants.Stderr,
+                                Max = 4 * Constants.ByteInMegaByte,
                             },
                         },
                         CpuLimit = testCase.TimeLimit,
                         MemoryLimit = testCase.MemoryLimit,
-                        ProcessLimit = 50,
+                        ProcessLimit = 10,
                         CopyIn = new Dictionary<string, SandboxFile>
                         {
                             { compileResult.OutputFile, new SandboxPreparedFile { FileId = compileResult.OutputFileId } },
                         },
-                        CopyOut = new string[] { "stdout", "stderr" },
+                        CopyOut = new string[] { Constants.Stdout, Constants.Stderr },
                     }
             },
         };
@@ -324,12 +324,12 @@ public class SandboxService : ISandboxService
                             },
                             new SandboxCollectorFile
                             {
-                                Name = "stdout",
+                                Name = Constants.Stdout,
                                 Max = 10240,
                             },
                             new SandboxCollectorFile
                             {
-                                Name = "stderr",
+                                Name = Constants.Stderr,
                                 Max = 10240,
                             },
                         },
@@ -340,7 +340,7 @@ public class SandboxService : ISandboxService
                         {
                             { languageInfo.CodeFile, new SandboxMemoryFile { Content = code } },
                         },
-                        CopyOut = new string[] { "stdout", "stderr" },
+                        CopyOut = new string[] { Constants.Stdout, Constants.Stderr },
                     }
             },
         };

@@ -77,7 +77,7 @@ public class SandboxCollectorFile : SandboxFile
     public string Name { get; set; }
 
     [JsonPropertyName("max")]
-    public int Max { get; set; }
+    public long Max { get; set; }
 
     [JsonPropertyName("pipe")]
     public bool Pipe { get; set; }

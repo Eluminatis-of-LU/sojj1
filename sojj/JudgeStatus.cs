@@ -52,6 +52,7 @@ public static class JudgeStatusExtensions
             Constants.FileError => JudgeStatus.STATUS_SYSTEM_ERROR,
             Constants.Signalled => JudgeStatus.STATUS_SYSTEM_ERROR,
             Constants.InternalError => JudgeStatus.STATUS_SYSTEM_ERROR,
+            Constants.OutputLimitExceeded => JudgeStatus.STATUS_RUNTIME_ERROR,
             _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
         };
     }
