@@ -34,7 +34,7 @@
   },
   "cs": {
     "type": "compiler",
-    "compile":  ["csc", "-optimize+", "-out:foo.exe", "foo.cs"],
+    "compile":  ["mono-csc", "-optimize+", "-out:foo.exe", "foo.cs"],
     "codeFile": "foo.cs",
     "outputFile": "foo.exe",
     "execute": ["mono", "foo.exe"]

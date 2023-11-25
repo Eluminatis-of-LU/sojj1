@@ -27,6 +27,7 @@ RUN apt-get update && \
 		python3 \
 		mono-runtime \
 		mono-mcs \
+		mono-devel \
 		libjavascriptcoregtk-4.0-bin \
 		openjdk-8-jdk-headless
 
