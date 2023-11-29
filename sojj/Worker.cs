@@ -30,6 +30,10 @@ public class Worker : BackgroundService
         await cacheService.InvalidateCacheAsync();
 
         await UpdateProblemDataAsync();
+        
+        var buffer = WebSocket.CreateClientBuffer(1024 * 4, 1024 * 4);
+
+        WebSocketReceiveResult webSocketReceiveResult;
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -38,17 +42,19 @@ public class Worker : BackgroundService
 
             var ws = await judgeService.ConsumeWebSocketAsync(stoppingToken);
 
-            var buffer = new byte[1024 * 4];
-
             while (ws.State == WebSocketState.Open)
             {
-                var result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), stoppingToken);
-                if (result.MessageType == WebSocketMessageType.Close)
+                string message = string.Empty;
+
+                do {
+                    webSocketReceiveResult = await ws.ReceiveAsync(buffer, stoppingToken);
+                    message += Encoding.UTF8.GetString(buffer.Array, 0, webSocketReceiveResult.Count);
+                } while (webSocketReceiveResult.MessageType != WebSocketMessageType.Close && !webSocketReceiveResult.EndOfMessage);
+
+                if (webSocketReceiveResult.MessageType == WebSocketMessageType.Close)
                 {
                     await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, stoppingToken);
                 }
-
-                var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
 
                 logger.LogInformation("Message received: {message}", message);
 
