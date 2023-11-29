@@ -130,7 +130,7 @@ public class Worker : BackgroundService
         int problemStatus = (int)JudgeStatus.STATUS_ACCEPTED;
         long totalMemory = 0;
         long totalTime = 0;
-        await foreach (TestCase testCase in problemService.GetTestCasesAsync(messageDto.ProblemId.ToString(), messageDto.DomainId))
+        await foreach (TestCase testCase in this.GetTestCasesAsync(messageDto))
         {
             logger.LogInformation("Running test case {testCase.CaseNumber}", testCase.CaseNumber);
 
@@ -181,7 +181,7 @@ public class Worker : BackgroundService
         int problemStatus = (int)JudgeStatus.STATUS_ACCEPTED;
         long totalMemory = 0;
         long totalTime = 0;
-        await foreach (TestCase testCase in problemService.GetTestCasesAsync(messageDto.ProblemId.ToString(), messageDto.DomainId))
+        await foreach (TestCase testCase in this.GetTestCasesAsync(messageDto))
         {
             logger.LogInformation("Running test case {testCase.CaseNumber}", testCase.CaseNumber);
 
@@ -224,6 +224,15 @@ public class Worker : BackgroundService
 
         logger.LogInformation("Procesed Compiled language for {runId} {language} {problemId} {domainId}",
                                    messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId);
+    }
+
+    private IAsyncEnumerable<TestCase> GetTestCasesAsync(JudgeProcessRequest messageDto)
+    {
+        if (messageDto.Type == JudgeProcessRequestType.Pretest)
+        {
+            return this.judgeService.GetPretestCasesAsync(messageDto.RunId);
+        }
+        return problemService.GetTestCasesAsync(messageDto.ProblemId.ToString(), messageDto.DomainId);
     }
 
     private bool TryParseMessageDto(string message, out JudgeProcessRequest messageDto)

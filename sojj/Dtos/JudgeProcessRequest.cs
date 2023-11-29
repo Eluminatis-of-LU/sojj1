@@ -23,5 +23,11 @@ public class JudgeProcessRequest
     public string Code { get; set; }
 
     [JsonPropertyName("type")]
-    public int Type { get; set; }
+    public JudgeProcessRequestType Type { get; set; }
+}
+
+public enum JudgeProcessRequestType
+{
+    Submission = 0,
+    Pretest = 1,
 }

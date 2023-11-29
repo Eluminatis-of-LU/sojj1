@@ -17,4 +17,6 @@ public interface IJudgeService
     Task<ZipArchive?> GetProblemDataAsync(int problemId, string domainId);
 
     Task<ClientWebSocket> ConsumeWebSocketAsync(CancellationToken cancellationToken);
+
+    IAsyncEnumerable<TestCase> GetPretestCasesAsync(string runId);
 }

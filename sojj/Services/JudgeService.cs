@@ -6,6 +6,7 @@ using Sojj.Services.Abstractions;
 using System.IO.Compression;
 using System.Net;
 using System.Net.WebSockets;
+using System.Text;
 using System.Text.Json;
 
 namespace Sojj.Services;
@@ -76,6 +77,52 @@ internal class JudgeService : IJudgeService
 
         logger.LogError("Get datalist failed");
         return null;
+    }
+
+    public async IAsyncEnumerable<TestCase> GetPretestCasesAsync(string runId)
+    {
+        var response = await httpClient.GetAsync($"/records/{runId}/data");
+        if (!response.IsSuccessStatusCode)
+        {
+            yield break;
+        }
+
+        ZipArchive zipArchive = new ZipArchive(await response.Content.ReadAsStreamAsync());
+
+        var configEntry = zipArchive.GetEntry("Config.ini");
+
+        var configStreamReader = new StreamReader(configEntry.Open());
+
+        int numberOfCases = int.Parse(await configStreamReader.ReadLineAsync());
+
+        for (int caseNumber = 0; caseNumber < numberOfCases; caseNumber++)
+        {
+            var splitted = (await configStreamReader.ReadLineAsync()).Split('|');
+
+            var inputFile = splitted[0];
+
+            var outputFile = splitted[1];
+
+            var inputEntry = zipArchive.GetEntry($"Input/{inputFile}");
+
+            var outputEntry = zipArchive.GetEntry($"Output/{outputFile}");
+
+            var inputStreamReader = new StreamReader(inputEntry.Open());
+
+            var outputStreamReader = new StreamReader(outputEntry.Open());
+
+            yield return new TestCase
+            {
+                CaseNumber = caseNumber,
+                Input = await inputStreamReader.ReadToEndAsync(),
+                Output = await outputStreamReader.ReadToEndAsync(),
+                TimeLimit = long.Parse(splitted[2]) * Constants.NanoSecondInSecond,
+                Score = int.Parse(splitted[3]),
+                MemoryLimit = long.Parse(splitted[4]) * Constants.ByteInKiloByte,
+                TotalCase = numberOfCases,
+                ValidatorType= ValidatorType.FileValidator,
+            };
+        }
     }
 
     public async Task<ZipArchive?> GetProblemDataAsync(int problemId, string domainId)
