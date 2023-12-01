@@ -38,7 +38,7 @@ namespace Sojj.Services
             }
             else
             {
-                testCaseResult.Status = JudgeStatus.STATUS_ACCEPTED;
+                testCaseResult.Status = JudgeStatus.STATUS_WRONG_ANSWER;
             }
 
             return Task.FromResult(testCaseResult);
