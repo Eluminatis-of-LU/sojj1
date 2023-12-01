@@ -1,6 +1,6 @@
 ﻿using Sojj.Dtos;
 
-namespace Sojj.Services.Abstractions;
+namespace Sojj.Services.Contracts;
 
 public interface ISandboxService
 {

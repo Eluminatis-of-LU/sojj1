@@ -2,7 +2,7 @@
 using Polly;
 using Polly.Extensions.Http;
 using Sojj.Dtos;
-using Sojj.Services.Abstractions;
+using Sojj.Services.Contracts;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -17,6 +17,7 @@ public class SandboxService : ISandboxService
     private readonly HttpClient httpClient;
     private readonly string languageFilePath;
     private readonly Dictionary<string, Language> languages;
+    private readonly string[] sandboxEnvironment;
 
     public SandboxService(ILogger<SandboxService> logger, IConfiguration configuration)
     {
@@ -39,6 +40,7 @@ public class SandboxService : ISandboxService
         languageFilePath = this.configuration.GetValue<string>("LanguageFilePath") ?? throw new ArgumentNullException("LanguageFilePath");
         using var stream = File.OpenRead(languageFilePath);
         languages = JsonSerializer.Deserialize<Dictionary<string, Language>>(stream);
+        this.sandboxEnvironment = this.configuration.GetSection("SandboxEnvironment").Get<string[]>() ?? throw new ArgumentNullException("SandboxEnvironment");
     }
 
     public async Task CheckHealthAsync()
@@ -84,7 +86,7 @@ public class SandboxService : ISandboxService
                     new Command
                     {
                         Args = languageInfo.Compile,
-                        Env = new string[] {"PATH=/usr/bin:/bin"},
+                        Env = this.sandboxEnvironment,
                         Files = new SandboxFile[]
                         {
                             new SandboxCollectorFile
@@ -175,7 +177,7 @@ public class SandboxService : ISandboxService
                     new Command
                     {
                         Args = compileResult.ExecuteArgs,
-                        Env = new string[] {"PATH=/usr/bin:/bin"},
+                        Env = this.sandboxEnvironment,
                         Files = new SandboxFile[]
                         {
                             new SandboxMemoryFile
@@ -315,7 +317,7 @@ public class SandboxService : ISandboxService
                     new Command
                     {
                         Args = languageInfo.Execute,
-                        Env = new string[] {"PATH=/usr/bin:/bin"},
+                        Env = this.sandboxEnvironment,
                         Files = new SandboxFile[]
                         {
                             new SandboxMemoryFile

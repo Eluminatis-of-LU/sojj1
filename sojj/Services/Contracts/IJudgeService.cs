@@ -2,7 +2,7 @@ using Sojj.Dtos;
 using System.IO.Compression;
 using System.Net.WebSockets;
 
-namespace Sojj.Services.Abstractions;
+namespace Sojj.Services.Contracts;
 
 public interface IJudgeService
 {

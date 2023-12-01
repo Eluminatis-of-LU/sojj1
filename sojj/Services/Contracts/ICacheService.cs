@@ -1,6 +1,6 @@
 ﻿using System.IO.Compression;
 
-namespace Sojj.Services.Abstractions;
+namespace Sojj.Services.Contracts;
 
 public interface ICacheService
 {

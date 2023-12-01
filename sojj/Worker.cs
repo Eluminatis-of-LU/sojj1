@@ -1,5 +1,5 @@
 using Sojj.Dtos;
-using Sojj.Services.Abstractions;
+using Sojj.Services.Contracts;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;

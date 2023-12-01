@@ -1,5 +1,5 @@
 ﻿using Sojj.Dtos;
-using Sojj.Services.Abstractions;
+using Sojj.Services.Contracts;
 using System.Text.Json;
 
 namespace Sojj.Services;

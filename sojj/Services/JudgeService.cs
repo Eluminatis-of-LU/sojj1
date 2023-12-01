@@ -2,7 +2,7 @@
 using Polly;
 using Polly.Extensions.Http;
 using Sojj.Dtos;
-using Sojj.Services.Abstractions;
+using Sojj.Services.Contracts;
 using System.IO.Compression;
 using System.Net;
 using System.Net.WebSockets;

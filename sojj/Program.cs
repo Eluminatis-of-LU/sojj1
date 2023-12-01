@@ -1,6 +1,6 @@
 using Sojj;
 using Sojj.Services;
-using Sojj.Services.Abstractions;
+using Sojj.Services.Contracts;
 
 
 IHost host = Host.CreateDefaultBuilder(args)

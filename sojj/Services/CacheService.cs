@@ -1,4 +1,4 @@
-﻿using Sojj.Services.Abstractions;
+﻿using Sojj.Services.Contracts;
 using System.IO.Compression;
 
 namespace Sojj.Services;
