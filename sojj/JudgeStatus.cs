@@ -10,8 +10,7 @@ public enum JudgeStatus
     STATUS_COMPILE_ERROR = 7,
     STATUS_SYSTEM_ERROR = 8,
     STATUS_JUDGING = 20,
-    STATUS_COMPILING = 21,
-    STATUS_INTERPRETED_LANGUAGE = 40,
+    STATUS_COMPILING = 21
 }
 
 public static class JudgeStatusExtensions
@@ -29,7 +28,6 @@ public static class JudgeStatusExtensions
             JudgeStatus.STATUS_SYSTEM_ERROR => Constants.SystemError,
             JudgeStatus.STATUS_JUDGING => Constants.Judging,
             JudgeStatus.STATUS_COMPILING => Constants.Compiling,
-            JudgeStatus.STATUS_INTERPRETED_LANGUAGE => Constants.InterpretedLanguage,
             _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
         };
     }
@@ -47,7 +45,6 @@ public static class JudgeStatusExtensions
             Constants.SystemError => JudgeStatus.STATUS_SYSTEM_ERROR,
             Constants.Judging => JudgeStatus.STATUS_JUDGING,
             Constants.Compiling => JudgeStatus.STATUS_COMPILING,
-            Constants.InterpretedLanguage => JudgeStatus.STATUS_INTERPRETED_LANGUAGE,
             Constants.NonzeroExitStatus => JudgeStatus.STATUS_RUNTIME_ERROR,
             Constants.FileError => JudgeStatus.STATUS_SYSTEM_ERROR,
             Constants.Signalled => JudgeStatus.STATUS_SYSTEM_ERROR,

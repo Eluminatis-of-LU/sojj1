@@ -29,7 +29,9 @@
   },
   "js": {
     "type": "interpreter",
+    "compile": ["true"],
     "codeFile": "foo.js",
+    "outputFile": "foo.js",
     "execute": ["nodejs", "foo.js"]
   },
   "cs": {

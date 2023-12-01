@@ -69,15 +69,7 @@ public class SandboxService : ISandboxService
                 Message = "Language not found",
             };
         }
-        if (languageInfo.Type != "compiler")
-        {
-            logger.LogInformation("Language {language} is not a compile language", language);
-            return new CompileResult
-            {
-                Status = JudgeStatus.STATUS_INTERPRETED_LANGUAGE,
-                Message = "Language is not a compiled language",
-            };
-        }
+
         logger.LogInformation("Compiling {runId}", runId);
         var request = new SandboxRunRequest
         {
