@@ -7,5 +7,5 @@ public class Problem
     [JsonPropertyName("domain_id")]
     public string DomainId { get; set; }
     [JsonPropertyName("pid")]
-    public int ProblemId { get; set; }
+    public object ProblemId { get; set; }
 }

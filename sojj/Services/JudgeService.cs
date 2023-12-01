@@ -125,7 +125,7 @@ internal class JudgeService : IJudgeService
         }
     }
 
-    public async Task<ZipArchive?> GetProblemDataAsync(int problemId, string domainId)
+    public async Task<ZipArchive?> GetProblemDataAsync(string problemId, string domainId)
     {
         var response = await httpClient.GetAsync($"/d/{domainId}/p/{problemId}/data");
         if (response.IsSuccessStatusCode)

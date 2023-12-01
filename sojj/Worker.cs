@@ -256,7 +256,7 @@ public class Worker : BackgroundService
         {
             return this.judgeService.GetPretestCasesAsync(messageDto.RunId);
         }
-        return problemService.GetTestCasesAsync(messageDto.ProblemId.ToString(), messageDto.DomainId);
+        return problemService.GetTestCasesAsync(messageDto.ProblemId, messageDto.DomainId);
     }
 
     private bool TryParseMessageDto(string message, out JudgeProcessRequest messageDto)
@@ -280,17 +280,18 @@ public class Worker : BackgroundService
         var dataList = await judgeService.GetDataListAsync(lastUpdateAt);
         foreach (var problem in dataList.Problems)
         {
-            logger.LogInformation($"Problem {problem.ProblemId} updated at {problem.DomainId}");
-            var zipData = await judgeService.GetProblemDataAsync(problem.ProblemId, problem.DomainId);
+            string problemId = problem.ProblemId.ToString();
+            logger.LogInformation("Problem {problemId} updated at {dommainId}", problemId, problem.DomainId);
+            var zipData = await judgeService.GetProblemDataAsync(problemId, problem.DomainId);
             if (zipData == null)
             {
-                logger.LogError("Problem data not found for {problemid}, {dommainId}", problem.ProblemId, problem.DomainId);
+                logger.LogError("Problem data not found for {problemid}, {dommainId}", problemId, problem.DomainId);
                 continue;
             }
 
-            await cacheService.InvalidateCacheAsync(problem.DomainId, problem.ProblemId.ToString());
+            await cacheService.InvalidateCacheAsync(problem.DomainId, problemId);
 
-            await cacheService.WriteCacheAsync(zipData, problem.DomainId, problem.ProblemId.ToString(), dataList.UnixTimestamp);
+            await cacheService.WriteCacheAsync(zipData, problem.DomainId, problemId, dataList.UnixTimestamp);
         }
     }
 }

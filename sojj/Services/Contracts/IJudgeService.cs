@@ -14,7 +14,7 @@ public interface IJudgeService
 
     Task<DataList?> GetDataListAsync(int lastUpdatedAtTimeStamp);
 
-    Task<ZipArchive?> GetProblemDataAsync(int problemId, string domainId);
+    Task<ZipArchive?> GetProblemDataAsync(string problemId, string domainId);
 
     Task<ClientWebSocket> ConsumeWebSocketAsync(CancellationToken cancellationToken);
 
