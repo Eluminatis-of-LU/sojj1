@@ -14,8 +14,15 @@ public class Worker : BackgroundService
     private readonly IConfiguration configuration;
     private readonly ISandboxService sandboxService;
     private readonly IProblemService problemService;
+    private readonly IEnumerable<IValidatorService> validatorServices;
 
-    public Worker(ILogger<Worker> logger, IConfiguration configuration, IJudgeService judgeService, ICacheService cacheService, ISandboxService sandboxService, IProblemService problemService)
+    public Worker(ILogger<Worker> logger,
+        IConfiguration configuration,
+        IJudgeService judgeService,
+        ICacheService cacheService,
+        ISandboxService sandboxService,
+        IProblemService problemService,
+        IEnumerable<IValidatorService> validatorServices)
     {
         this.logger = logger;
         this.configuration = configuration;
@@ -23,6 +30,7 @@ public class Worker : BackgroundService
         this.cacheService = cacheService;
         this.sandboxService = sandboxService;
         this.problemService = problemService;
+        this.validatorServices = validatorServices;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -142,6 +150,11 @@ public class Worker : BackgroundService
 
             var testCaseResult = await sandboxService.RunInterpreterAsync(testCase, messageDto.Code, messageDto.RunId, messageDto.Language);
 
+            if (testCaseResult.Status.Equals(JudgeStatus.STATUS_ACCEPTED))
+            {
+                testCaseResult = await this.validatorServices.First(x => x.Type.Equals(testCase.ValidatorType)).ValidateAsync(testCase, testCaseResult);
+            }
+
             var testCaseResponse = new JudgeProcessResponse
             {
                 Key = "next",
@@ -192,6 +205,11 @@ public class Worker : BackgroundService
             logger.LogInformation("Running test case {testCase.CaseNumber}", testCase.CaseNumber);
 
             var testCaseResult = await sandboxService.RunAsync(testCase, compileResult);
+
+            if (testCaseResult.Status.Equals(JudgeStatus.STATUS_ACCEPTED))
+            {
+                testCaseResult = await this.validatorServices.First(x => x.Type.Equals(testCase.ValidatorType)).ValidateAsync(testCase, testCaseResult);
+            }
 
             var testCaseResponse = new JudgeProcessResponse
             {

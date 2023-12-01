@@ -12,6 +12,9 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<ICacheService, CacheService>();
         services.AddSingleton<IProblemService, ProblemServices>();
         services.AddSingleton<ISandboxService, SandboxService>();
+        services.AddSingleton<IValidatorService, FileValidatorService>();
+        services.AddSingleton<IValidatorService, WordValidatorService>();
+        services.AddSingleton<IValidatorService, LineValidatorService>();
 
         services.AddApplicationInsightsTelemetryWorkerService();
     })

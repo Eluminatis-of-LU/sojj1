@@ -17,4 +17,6 @@ public class TestCase
     public int TotalCase { get; set; }
 
     public ValidatorType ValidatorType { get; set; }
+
+    public double Epsilon { get; set; }
 }

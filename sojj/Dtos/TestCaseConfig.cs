@@ -9,4 +9,6 @@ public class TestCaseConfig
     public ValidatorType ValidatorType { get; set; }
 
     public TestCase[] TestCases { get; set; }
+
+    public double Epsilon { get; set; }
 }

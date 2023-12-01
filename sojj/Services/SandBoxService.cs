@@ -260,41 +260,14 @@ public class SandboxService : ISandboxService
 
         logger.LogInformation("Run success");
 
-        if (testCase.ValidatorType == ValidatorType.FileValidator)
-        {
-            var expectedOutput = testCase.Output.Trim();
-            var actualOutput = runResult.Files[Constants.Stdout].Trim();
-            if (expectedOutput.Equals(actualOutput))
-            {
-                logger.LogInformation("Test case {testCase.CaseNumber} passed", testCase.CaseNumber);
-                return new TestCaseResult
-                {
-                    Status = JudgeStatus.STATUS_ACCEPTED,
-                    Message = runResult.Files[Constants.Stderr],
-                    TimeInNs = runResult.Time,
-                    MemoryInByte = runResult.Memory,
-                    Score = testCase.Score,
-                };
-            }
-            else
-            {
-                logger.LogInformation("Test case {testCase.CaseNumber} failed", testCase.CaseNumber);
-                return new TestCaseResult
-                {
-                    Status = JudgeStatus.STATUS_WRONG_ANSWER,
-                    Message = "",
-                    TimeInNs = runResult.Time,
-                    MemoryInByte = runResult.Memory,
-                    Score = 0,
-                };
-            }
-        }
-
         return new TestCaseResult
         {
-            Status = JudgeStatus.STATUS_SYSTEM_ERROR,
-            Message = "Unexpected",
-            Score = 0,
+            Status = JudgeStatus.STATUS_ACCEPTED,
+            Message = runResult.Files[Constants.Stderr],
+            TimeInNs = runResult.Time,
+            MemoryInByte = runResult.Memory,
+            Score = testCase.Score,
+            Output = runResult.Files[Constants.Stdout],
         };
     }
 
@@ -400,41 +373,14 @@ public class SandboxService : ISandboxService
 
         logger.LogInformation("Run success");
 
-        if (testCase.ValidatorType == ValidatorType.FileValidator)
-        {
-            var expectedOutput = testCase.Output.Trim();
-            var actualOutput = runResult.Files[Constants.Stdout].Trim();
-            if (expectedOutput.Equals(actualOutput))
-            {
-                logger.LogInformation("Test case {testCase.CaseNumber} passed", testCase.CaseNumber);
-                return new TestCaseResult
-                {
-                    Status = JudgeStatus.STATUS_ACCEPTED,
-                    Message = runResult.Files[Constants.Stderr],
-                    TimeInNs = runResult.Time,
-                    MemoryInByte = runResult.Memory,
-                    Score = testCase.Score,
-                };
-            }
-            else
-            {
-                logger.LogInformation("Test case {testCase.CaseNumber} failed", testCase.CaseNumber);
-                return new TestCaseResult
-                {
-                    Status = JudgeStatus.STATUS_WRONG_ANSWER,
-                    Message = "",
-                    TimeInNs = runResult.Time,
-                    MemoryInByte = runResult.Memory,
-                    Score = 0,
-                };
-            }
-        }
-
         return new TestCaseResult
         {
-            Status = JudgeStatus.STATUS_SYSTEM_ERROR,
-            Message = "Unexpected",
-            Score = 0,
+            Status = JudgeStatus.STATUS_ACCEPTED,
+            Message = runResult.Files[Constants.Stderr],
+            TimeInNs = runResult.Time,
+            MemoryInByte = runResult.Memory,
+            Score = testCase.Score,
+            Output = runResult.Files[Constants.Stdout],
         };
     }
 }

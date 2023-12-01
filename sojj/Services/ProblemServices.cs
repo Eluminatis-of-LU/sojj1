@@ -45,6 +45,7 @@ public class ProblemServices : IProblemService
                 MemoryLimit = testCaseConfig.MemoryLimit * Constants.ByteInKiloByte,
                 TotalCase = testCaseConfig.TestCases.Length,
                 ValidatorType = testCaseConfig.ValidatorType,
+                Epsilon = testCaseConfig.Epsilon,
             };
         }
     }
