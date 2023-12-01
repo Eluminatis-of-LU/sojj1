@@ -300,17 +300,17 @@ public class SandboxService : ISandboxService
                             new SandboxCollectorFile
                             {
                                 Name = Constants.Stdout,
-                                Max = 10240,
+                                Max = 4 * Constants.ByteInMegaByte,
                             },
                             new SandboxCollectorFile
                             {
                                 Name = Constants.Stderr,
-                                Max = 10240,
+                                Max = 4 * Constants.ByteInMegaByte,
                             },
                         },
                         CpuLimit = testCase.TimeLimit,
                         MemoryLimit = testCase.MemoryLimit,
-                        ProcessLimit = 50,
+                        ProcessLimit = 10,
                         CopyIn = new Dictionary<string, SandboxFile>
                         {
                             { languageInfo.CodeFile, new SandboxMemoryFile { Content = code } },

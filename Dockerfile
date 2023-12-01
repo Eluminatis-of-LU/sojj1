@@ -28,7 +28,7 @@ RUN apt-get update && \
 		mono-runtime \
 		mono-mcs \
 		mono-devel \
-		libjavascriptcoregtk-4.0-bin \
+		nodejs \
 		openjdk-8-jdk-headless
 
 

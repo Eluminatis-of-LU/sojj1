@@ -30,7 +30,7 @@
   "js": {
     "type": "interpreter",
     "codeFile": "foo.js",
-    "execute": ["jsc", "foo.js"]
+    "execute": ["nodejs", "foo.js"]
   },
   "cs": {
     "type": "compiler",
