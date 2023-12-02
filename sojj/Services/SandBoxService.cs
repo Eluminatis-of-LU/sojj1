@@ -156,6 +156,14 @@ public class SandboxService : ISandboxService
 
         logger.LogInformation("Compile success");
 
+        foreach (var file in compileResult.FileIds)
+        {
+            if (file.Key != languageInfo.OutputFile)
+            {
+                await DeleteFileAsync(file.Value);
+            }
+        }
+
         return new CompileResult
         {
             Status = JudgeStatus.STATUS_ACCEPTED,
@@ -166,6 +174,18 @@ public class SandboxService : ISandboxService
             OutputFileId = compileResult.FileIds[languageInfo.OutputFile],
             OutputFile = languageInfo.OutputFile,
         };
+    }
+
+    public async Task DeleteFileAsync(string fileId)
+    {
+        try
+        {
+            await httpClient.DeleteAsync($"/file/{fileId}");
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error while deleting file {fileId}", fileId);
+        }
     }
 
     public async Task<TestCaseResult> RunAsync(TestCase testCase, CompileResult compileResult)

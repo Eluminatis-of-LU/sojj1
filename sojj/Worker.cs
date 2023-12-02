@@ -186,6 +186,8 @@ public class Worker : BackgroundService
 
         await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(judgeProcessResponse)), WebSocketMessageType.Text, true, stoppingToken);
 
+        await this.sandboxService.DeleteFileAsync(compileResult.OutputFileId);
+
         logger.LogInformation("Procesed Compiled language for {runId} {language} {problemId} {domainId}",
                                    messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId);
     }
