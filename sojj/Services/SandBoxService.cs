@@ -18,6 +18,10 @@ public class SandboxService : ISandboxService
     private readonly string languageFilePath;
     private readonly Dictionary<string, Language> languages;
     private readonly string[] sandboxEnvironment;
+    private readonly int processLimitForRuns;
+    private readonly long memoryLimitForRuns;
+    private readonly long cpuLimitForRuns;
+    private readonly long outputLimitForRuns;
 
     public SandboxService(ILogger<SandboxService> logger, IConfiguration configuration)
     {
@@ -41,6 +45,10 @@ public class SandboxService : ISandboxService
         using var stream = File.OpenRead(languageFilePath);
         languages = JsonSerializer.Deserialize<Dictionary<string, Language>>(stream);
         this.sandboxEnvironment = this.configuration.GetSection("SandboxEnvironment").Get<string[]>() ?? throw new ArgumentNullException("SandboxEnvironment");
+        this.processLimitForRuns = this.configuration.GetValue<int>("ProcessLimitForRuns");
+        this.memoryLimitForRuns = this.configuration.GetValue<long>("MemoryLimitForRuns");
+        this.cpuLimitForRuns = this.configuration.GetValue<long>("CpuLimitForRuns");
+        this.outputLimitForRuns = this.configuration.GetValue<long>("OutputLimitForRuns");
     }
 
     public async Task CheckHealthAsync()
@@ -84,17 +92,17 @@ public class SandboxService : ISandboxService
                             new SandboxCollectorFile
                             {
                                 Name = Constants.Stdout,
-                                Max = 4 * Constants.ByteInMegaByte,
+                                Max = this.outputLimitForRuns * Constants.ByteInMegaByte,
                             },
                             new SandboxCollectorFile
                             {
                                 Name = Constants.Stderr,
-                                Max = 4 * Constants.ByteInMegaByte,
+                                Max = this.outputLimitForRuns * Constants.ByteInMegaByte,
                             },
                         },
-                        CpuLimit = 15 * Constants.NanoSecondInSecond,
-                        MemoryLimit = 256 * Constants.ByteInMegaByte,
-                        ProcessLimit = 10,
+                        CpuLimit = this.cpuLimitForRuns * Constants.NanoSecondInSecond,
+                        MemoryLimit = this.memoryLimitForRuns * Constants.ByteInMegaByte,
+                        ProcessLimit = this.processLimitForRuns,
                         CopyIn = new Dictionary<string, SandboxFile>
                         {
                             { languageInfo.CodeFile, new SandboxMemoryFile { Content = sourceCode } },
@@ -179,133 +187,20 @@ public class SandboxService : ISandboxService
                             new SandboxCollectorFile
                             {
                                 Name = Constants.Stdout,
-                                Max = 4 * Constants.ByteInMegaByte,
+                                Max = this.outputLimitForRuns * Constants.ByteInMegaByte,
                             },
                             new SandboxCollectorFile
                             {
                                 Name = Constants.Stderr,
-                                Max = 4 * Constants.ByteInMegaByte,
+                                Max = this.outputLimitForRuns * Constants.ByteInMegaByte,
                             },
                         },
                         CpuLimit = testCase.TimeLimit,
                         MemoryLimit = testCase.MemoryLimit,
-                        ProcessLimit = 10,
+                        ProcessLimit = this.processLimitForRuns,
                         CopyIn = new Dictionary<string, SandboxFile>
                         {
                             { compileResult.OutputFile, new SandboxPreparedFile { FileId = compileResult.OutputFileId } },
-                        },
-                        CopyOut = new string[] { Constants.Stdout, Constants.Stderr },
-                    }
-            },
-        };
-
-        logger.LogDebug("Run request: {request}", JsonSerializer.Serialize(request));
-
-        logger.LogInformation("Running test case {testCase.CaseNumber}", testCase.CaseNumber);
-
-        var response = await httpClient.PostAsJsonAsync("/run", request);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            logger.LogError("Run failed: {statusCode}", response.StatusCode);
-            return new TestCaseResult
-            {
-                Status = JudgeStatus.STATUS_SYSTEM_ERROR,
-                Message = "Run failed",
-                Score = 0,
-            };
-        }
-
-        var content = await response.Content.ReadAsStringAsync();
-
-        logger.LogDebug("Run result: {content}", content);
-
-        logger.LogInformation("Running finished test case {testCase.CaseNumber} done", testCase.CaseNumber);
-
-        var result = JsonSerializer.Deserialize<SandboxRunResult[]>(content);
-
-        if (result == null || result.Length != 1)
-        {
-            logger.LogError("Run result length is not 1");
-            return new TestCaseResult
-            {
-                Status = JudgeStatus.STATUS_SYSTEM_ERROR,
-                Message = "Run result length is not 1",
-                Score = 0,
-            };
-        }
-
-        var runResult = result[0];
-
-        if (runResult.Status != Constants.Accepted)
-        {
-            logger.LogError("Run failed: {status}", runResult.Status);
-            return new TestCaseResult
-            {
-                Status = runResult.Status.ToJudgeStatus(),
-                Message = runResult.Files[Constants.Stderr],
-                Score = 0,
-                MemoryInByte = runResult.Memory,
-                TimeInNs = runResult.Time,
-            };
-        }
-
-        logger.LogInformation("Run success");
-
-        return new TestCaseResult
-        {
-            Status = JudgeStatus.STATUS_ACCEPTED,
-            Message = runResult.Files[Constants.Stderr],
-            TimeInNs = runResult.Time,
-            MemoryInByte = runResult.Memory,
-            Score = testCase.Score,
-            Output = runResult.Files[Constants.Stdout],
-        };
-    }
-
-    public async Task<TestCaseResult> RunInterpreterAsync(TestCase testCase, string code, string runId, string language)
-    {
-        if (!languages.TryGetValue(language, out var languageInfo))
-        {
-            logger.LogError("Language {language} not found", language);
-            return new TestCaseResult
-            {
-                Status = JudgeStatus.STATUS_COMPILE_ERROR,
-                Message = "Language not found",
-            };
-        }
-
-        var request = new SandboxRunRequest
-        {
-            Commands = new Command[]
-            {
-                    new Command
-                    {
-                        Args = languageInfo.Execute,
-                        Env = this.sandboxEnvironment,
-                        Files = new SandboxFile[]
-                        {
-                            new SandboxMemoryFile
-                            {
-                                Content = testCase.Input,
-                            },
-                            new SandboxCollectorFile
-                            {
-                                Name = Constants.Stdout,
-                                Max = 4 * Constants.ByteInMegaByte,
-                            },
-                            new SandboxCollectorFile
-                            {
-                                Name = Constants.Stderr,
-                                Max = 4 * Constants.ByteInMegaByte,
-                            },
-                        },
-                        CpuLimit = testCase.TimeLimit,
-                        MemoryLimit = testCase.MemoryLimit,
-                        ProcessLimit = 10,
-                        CopyIn = new Dictionary<string, SandboxFile>
-                        {
-                            { languageInfo.CodeFile, new SandboxMemoryFile { Content = code } },
                         },
                         CopyOut = new string[] { Constants.Stdout, Constants.Stderr },
                     }
