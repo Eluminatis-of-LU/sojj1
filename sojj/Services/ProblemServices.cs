@@ -33,6 +33,11 @@ public class ProblemServices : IProblemService
         string inputPath = Path.Combine(path, "Input");
         string outputPath = Path.Combine(path, "Output");
 
+        if (testCaseConfig.ValidatorType.Equals(ValidatorType.CustomValidator))
+        {
+            testCaseConfig.ValidatorSourceCode = await File.ReadAllTextAsync(Path.Combine(path, testCaseConfig.ValidatorSourceCode));
+        }
+
         for (int caseNumber = 0; caseNumber < testCaseConfig.TestCases.Length; caseNumber++)
         {
             yield return new TestCase
@@ -46,6 +51,8 @@ public class ProblemServices : IProblemService
                 TotalCase = testCaseConfig.TestCases.Length,
                 ValidatorType = testCaseConfig.ValidatorType,
                 Epsilon = testCaseConfig.Epsilon,
+                ValidatorSourceCode = testCaseConfig.ValidatorSourceCode,
+                ValidatorLanguage = testCaseConfig.ValidatorLanguage,
             };
         }
     }

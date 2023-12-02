@@ -11,4 +11,8 @@ public class TestCaseConfig
     public TestCase[] TestCases { get; set; }
 
     public double Epsilon { get; set; }
+
+    public string? ValidatorSourceCode { get; set; }
+
+    public string? ValidatorLanguage { get; set; }
 }

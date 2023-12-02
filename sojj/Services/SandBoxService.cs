@@ -4,6 +4,7 @@ using Polly.Extensions.Http;
 using Sojj.Dtos;
 using Sojj.Services.Contracts;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -55,7 +56,7 @@ public class SandboxService : ISandboxService
     {
         logger.LogInformation("Checking sandbox service health");
 
-        var response = await httpClient.GetAsync("/config");
+        var response = await httpClient.GetAsync("/version");
 
         if (!response.IsSuccessStatusCode)
         {
@@ -188,8 +189,14 @@ public class SandboxService : ISandboxService
         }
     }
 
-    public async Task<TestCaseResult> RunAsync(TestCase testCase, CompileResult compileResult)
+    public async Task<TestCaseResult> RunAsync(TestCase testCase, CompileResult compileResult, Dictionary<string, SandboxFile> copyIn)
     {
+        if (copyIn == null)
+        {
+            copyIn = new Dictionary<string, SandboxFile>();
+        }
+
+        copyIn.Add(compileResult.OutputFile, new SandboxPreparedFile { FileId = compileResult.OutputFileId });
         var request = new SandboxRunRequest
         {
             Commands = new Command[]
@@ -218,10 +225,7 @@ public class SandboxService : ISandboxService
                         CpuLimit = testCase.TimeLimit,
                         MemoryLimit = testCase.MemoryLimit,
                         ProcessLimit = this.processLimitForRuns,
-                        CopyIn = new Dictionary<string, SandboxFile>
-                        {
-                            { compileResult.OutputFile, new SandboxPreparedFile { FileId = compileResult.OutputFileId } },
-                        },
+                        CopyIn = copyIn,
                         CopyOut = new string[] { Constants.Stdout, Constants.Stderr },
                     }
             },
@@ -289,5 +293,25 @@ public class SandboxService : ISandboxService
             Score = testCase.Score,
             Output = runResult.Files[Constants.Stdout],
         };
+    }
+
+    public async Task<string?> UploadFileAsync(string fileName, string fileContent)
+    {
+        var formData = new MultipartFormDataContent();
+        formData.Add(new StringContent(fileContent), "file", fileName);
+        var response = await httpClient.PostAsync("/file", formData);
+        if (!response.IsSuccessStatusCode)
+        {
+            logger.LogError("Upload file failed: {statusCode}", response.StatusCode);
+            return null;
+        }
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        content = content.Replace("\"", "");
+
+        logger.LogDebug("Upload file result: {content}", content);
+
+        return content;
     }
 }

@@ -15,6 +15,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IValidatorService, FileValidatorService>();
         services.AddSingleton<IValidatorService, WordValidatorService>();
         services.AddSingleton<IValidatorService, LineValidatorService>();
+        services.AddSingleton<IValidatorService, CustomValidatorService>();
 
         services.AddApplicationInsightsTelemetryWorkerService();
     })

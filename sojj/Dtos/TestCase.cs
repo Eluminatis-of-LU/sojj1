@@ -19,4 +19,8 @@ public class TestCase
     public ValidatorType ValidatorType { get; set; }
 
     public double Epsilon { get; set; }
+
+    public string? ValidatorSourceCode { get; set; }
+
+    public string? ValidatorLanguage { get; set; }
 }
