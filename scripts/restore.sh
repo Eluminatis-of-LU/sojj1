@@ -15,13 +15,3 @@ apt-get update && \
 
 
 wget https://github.com/criyle/go-judge/releases/download/v1.8.0/go-judge_1.8.0_linux_amd64 -O /usr/bin/sandbox && chmod +x /usr/bin/sandbox
-
-wget https://github.com/bflattened/bflat/releases/download/v8.0.0/bflat-8.0.0-linux-glibc-x64.tar.gz
-
-rm -rf /usr/local/bflat
-
-mkdir -p /usr/local/bflat
-
-tar -xzf bflat-8.0.0-linux-glibc-x64.tar.gz -C /usr/local/bflat
-
-rm -rf bflat-8.0.0-linux-glibc-x64.tar.gz
