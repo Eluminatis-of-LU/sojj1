@@ -9,11 +9,17 @@ namespace Sojj.Services
 
         private readonly ILogger<CustomValidatorService> logger;
         private readonly ISandboxService sandboxService;
+        private readonly IConfiguration configuration;
+        private readonly long memoryLimitForRuns;
+        private readonly long cpuLimitForRuns;
 
-        public CustomValidatorService(ILogger<CustomValidatorService> logger, ISandboxService sandboxService)
+        public CustomValidatorService(ILogger<CustomValidatorService> logger, ISandboxService sandboxService, IConfiguration configuration)
         {
             this.logger = logger;
             this.sandboxService = sandboxService;
+            this.configuration = configuration;
+            this.memoryLimitForRuns = this.configuration.GetValue<long>("MemoryLimitForRuns");
+            this.cpuLimitForRuns = this.configuration.GetValue<long>("CpuLimitForRuns");
         }
 
         public async Task<TestCaseResult> ValidateAsync(TestCase testCase, TestCaseResult testCaseResult)
@@ -38,6 +44,9 @@ namespace Sojj.Services
             var validId = await this.sandboxService.UploadFileAsync("valid.txt", testCase.Output);
             var outputId = await this.sandboxService.UploadFileAsync("output.txt", testCaseResult.Output);
 
+            var testCaseMemoryLimit = testCase.MemoryLimit;
+            var testCaseTimeLimit = testCase.TimeLimit;
+
             var copyIn = new Dictionary<string, SandboxFile>
             {
                 { "input.txt", new SandboxPreparedFile { FileId = inputId } },
@@ -45,12 +54,18 @@ namespace Sojj.Services
                 { "output.txt", new SandboxPreparedFile { FileId = outputId } }
             };
 
+            testCase.MemoryLimit = this.memoryLimitForRuns;
+            testCase.TimeLimit = this.cpuLimitForRuns;
+
             var runResult = await this.sandboxService.RunAsync(testCase, compileResult, copyIn);
 
             await this.sandboxService.DeleteFileAsync(inputId!);
             await this.sandboxService.DeleteFileAsync(outputId!);
             await this.sandboxService.DeleteFileAsync(validId!);
             await this.sandboxService.DeleteFileAsync(compileResult.OutputFileId);
+
+            testCase.MemoryLimit = testCaseMemoryLimit;
+            testCase.TimeLimit = testCaseTimeLimit;
 
             if (runResult.Status != JudgeStatus.STATUS_ACCEPTED)
             {
