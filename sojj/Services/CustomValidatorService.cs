@@ -34,17 +34,20 @@ namespace Sojj.Services
         {
             string runId = Guid.NewGuid().ToString();
             var compileResult = await this.sandboxService.CompileAsync(testCase.ValidatorSourceCode!, runId, testCase.ValidatorLanguage!);
+            var inputId = await this.sandboxService.UploadFileAsync("input.txt", testCase.Input);
             var validId = await this.sandboxService.UploadFileAsync("valid.txt", testCase.Output);
             var outputId = await this.sandboxService.UploadFileAsync("output.txt", testCaseResult.Output);
 
             var copyIn = new Dictionary<string, SandboxFile>
             {
+                { "input.txt", new SandboxPreparedFile { FileId = inputId } },
                 { "valid.txt", new SandboxPreparedFile { FileId = validId } },
                 { "output.txt", new SandboxPreparedFile { FileId = outputId } }
             };
 
             var runResult = await this.sandboxService.RunAsync(testCase, compileResult, copyIn);
 
+            await this.sandboxService.DeleteFileAsync(inputId!);
             await this.sandboxService.DeleteFileAsync(outputId!);
             await this.sandboxService.DeleteFileAsync(validId!);
             await this.sandboxService.DeleteFileAsync(compileResult.OutputFileId);
