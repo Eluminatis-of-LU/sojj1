@@ -34,9 +34,16 @@
     "outputFile": "foo.js",
     "execute": ["nodejs", "foo.js"]
   },
-  "cs": {
+  "cs-mono": {
     "type": "compiler",
     "compile":  ["mono-csc", "-optimize+", "-out:foo.exe", "foo.cs"],
+    "codeFile": "foo.cs",
+    "outputFile": "foo.exe",
+    "execute": ["mono", "foo.exe"]
+  },
+  "cs": {
+    "type": "compiler",
+    "compile":  ["bflat", "--optimize-tim", "--out", "foo.exe", "foo.cs"],
     "codeFile": "foo.cs",
     "outputFile": "foo.exe",
     "execute": ["mono", "foo.exe"]
