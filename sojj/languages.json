@@ -34,18 +34,18 @@
     "outputFile": "foo.js",
     "execute": ["nodejs", "foo.js"]
   },
-  "cs-mono": {
+  "cs": {
     "type": "compiler",
     "compile":  ["mono-csc", "-optimize+", "-out:foo.exe", "foo.cs"],
     "codeFile": "foo.cs",
     "outputFile": "foo.exe",
     "execute": ["mono", "foo.exe"]
   },
-  "cs": {
+  "cs-bflat": {
     "type": "compiler",
-    "compile":  ["bflat", "--optimize-tim", "--out", "foo.exe", "foo.cs"],
+    "compile":  ["bflat", "build", "--optimize-time", "--out", "foo.exe", "foo.cs"],
     "codeFile": "foo.cs",
     "outputFile": "foo.exe",
-    "execute": ["mono", "foo.exe"]
+    "execute": ["foo.exe"]
   }
 }

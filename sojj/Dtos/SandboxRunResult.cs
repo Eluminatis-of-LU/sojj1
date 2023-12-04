@@ -11,7 +11,7 @@ public class SandboxRunResult
     public int ExitStatus { get; set; }
 
     [JsonPropertyName("time")]
-    public int Time { get; set; }
+    public long Time { get; set; }
 
     [JsonPropertyName("memory")]
     public long Memory { get; set; }
