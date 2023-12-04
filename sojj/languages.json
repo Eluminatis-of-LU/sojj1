@@ -62,6 +62,13 @@
     "outputFile": "foo.exe",
     "execute": ["mono", "foo.exe"]
   },
+  "cs_bflat": {
+    "type": "compiler",
+    "compile":  ["bflat", "build", "--optimize-time", "--out", "foo.exe", "foo.cs"],
+    "codeFile": "foo.cs",
+    "outputFile": "foo.exe",
+    "execute": ["foo.exe"]
+  },
   "ruby": {
     "type": "interpreter",
     "compile": ["true"],
