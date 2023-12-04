@@ -1,7 +1,14 @@
 {
   "c": {
     "type": "compiler",
-    "compile": [ "/usr/bin/gcc", "-w", "--std=c99", "-o", "foo", "foo.c", "-lm", "-I/include" ],
+    "compile": [ "/usr/bin/gcc", "-O2", "-w", "--std=c99", "-o", "foo", "foo.c", "-lm", "-I/include" ],
+    "codeFile": "foo.c",
+    "outputFile": "foo",
+    "execute": ["foo"]
+  },  
+  "c11": {
+    "type": "compiler",
+    "compile": [ "/usr/bin/gcc", "-O2", "-w", "--std=c11", "-o", "foo", "foo.c", "-lm", "-I/include" ],
     "codeFile": "foo.c",
     "outputFile": "foo",
     "execute": ["foo"]
@@ -9,6 +16,20 @@
   "cc": {
     "type": "compiler",
     "compile": [ "/usr/bin/g++", "-O2", "-w", "-std=c++17", "-o", "foo", "foo.cc", "-lm", "-I/include" ],
+    "codeFile": "foo.cc",
+    "outputFile": "foo",
+    "execute": ["foo"]
+  },
+  "cc11": {
+    "type": "compiler",
+    "compile": [ "/usr/bin/g++", "-O2", "-w", "-std=c++11", "-o", "foo", "foo.cc", "-lm", "-I/include" ],
+    "codeFile": "foo.cc",
+    "outputFile": "foo",
+    "execute": ["foo"]
+  },
+  "cc20": {
+    "type": "compiler",
+    "compile": [ "/usr/bin/g++", "-O2", "-w", "-std=c++20", "-o", "foo", "foo.cc", "-lm", "-I/include" ],
     "codeFile": "foo.cc",
     "outputFile": "foo",
     "execute": ["foo"]
@@ -29,10 +50,10 @@
   },
   "js": {
     "type": "interpreter",
-    "compile": ["true"],
+    "compile": ["node", "-c", "foo.js"],
     "codeFile": "foo.js",
     "outputFile": "foo.js",
-    "execute": ["nodejs", "foo.js"]
+    "execute": ["node", "foo.js"]
   },
   "cs": {
     "type": "compiler",
@@ -40,5 +61,12 @@
     "codeFile": "foo.cs",
     "outputFile": "foo.exe",
     "execute": ["mono", "foo.exe"]
+  },
+  "ruby": {
+    "type": "interpreter",
+    "compile": ["true"],
+    "codeFile": "foo.rb",
+    "outputFile": "foo.rb",
+    "execute": ["ruby", "foo.rb"]
   }
 }

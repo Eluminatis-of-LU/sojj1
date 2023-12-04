@@ -11,6 +11,7 @@ apt-get update && \
 		mono-mcs \
 		mono-devel \
 		nodejs \
+		ruby \
 		openjdk-8-jdk-headless
 
 
