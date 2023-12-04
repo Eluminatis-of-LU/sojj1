@@ -12,6 +12,7 @@ apt-get update && \
 		mono-devel \
 		nodejs \
 		ruby \
+		golang \
 		openjdk-8-jdk-headless
 
 wget https://github.com/bflattened/bflat/releases/download/v7.0.2/bflat-7.0.2-linux-glibc-x64.tar.gz

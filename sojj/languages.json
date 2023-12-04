@@ -75,5 +75,12 @@
     "codeFile": "foo.rb",
     "outputFile": "foo.rb",
     "execute": ["ruby", "foo.rb"]
+  },
+  "go": {
+    "type": "compiler",
+    "compile": ["go", "build", "-o", "foo", "foo.go"],
+    "codeFile": "foo.go",
+    "outputFile": "foo",
+    "execute": ["foo"]
   }
 }
