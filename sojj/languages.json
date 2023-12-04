@@ -41,7 +41,7 @@
     "outputFile": "foo.exe",
     "execute": ["mono", "foo.exe"]
   },
-  "cs-bflat": {
+  "cs_bflat": {
     "type": "compiler",
     "compile":  ["bflat", "build", "--optimize-time", "--out", "foo.exe", "foo.cs"],
     "codeFile": "foo.cs",
