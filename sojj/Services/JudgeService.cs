@@ -41,7 +41,8 @@ internal class JudgeService : IJudgeService
 
         httpClient = new HttpClient(pollyHandler);
         httpClient.BaseAddress = baseUrl;
-        wsUrl = new Uri("ws://" + httpClient.BaseAddress.Host + ":" + httpClient.BaseAddress.Port + "/judge/consume-conn/websocket");
+        var wsScheme = httpClient.BaseAddress.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase) ? "wss://" : "ws://";
+        wsUrl = new Uri(wsScheme + httpClient.BaseAddress.Host + ":" + httpClient.BaseAddress.Port + "/judge/consume-conn/websocket");
         ws = new ClientWebSocket();
         ws.Options.Cookies = socketHandler.CookieContainer;
     }
