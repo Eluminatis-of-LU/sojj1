@@ -67,6 +67,8 @@ namespace Sojj.Services
             testCase.MemoryLimit = testCaseMemoryLimit;
             testCase.TimeLimit = testCaseTimeLimit;
 
+            testCaseResult.Score = 0;
+
             if (runResult.Status != JudgeStatus.STATUS_ACCEPTED)
             {
                 testCaseResult.Status = runResult.Status;
@@ -75,6 +77,10 @@ namespace Sojj.Services
             {
                 runResult.Output = runResult.Output.Trim();
                 testCaseResult.Status = runResult.Output.ToJudgeStatus();
+                if (testCaseResult.Status == JudgeStatus.STATUS_ACCEPTED)
+                {
+                    testCaseResult.Score = testCase.Score;
+                }
             }
 
             return testCaseResult;

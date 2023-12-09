@@ -32,9 +32,12 @@ namespace Sojj.Services
         {
             var expected = testCase.Output.Trim();
             var actual = testCaseResult.Output.Trim();
+            testCaseResult.Score = 0;
+
             if (expected.Equals(actual))
             {
                 testCaseResult.Status = JudgeStatus.STATUS_ACCEPTED;
+                testCaseResult.Score = testCase.Score;
             }
             else
             {

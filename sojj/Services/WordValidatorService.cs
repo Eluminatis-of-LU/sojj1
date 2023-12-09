@@ -32,6 +32,7 @@ namespace Sojj.Services
         {
             var expected = testCase.Output.Split(_wordSeparators, StringSplitOptions.RemoveEmptyEntries);
             var actual = testCaseResult.Output.Split(_wordSeparators, StringSplitOptions.RemoveEmptyEntries);
+            testCaseResult.Score = 0;
 
             if (expected.Length != actual.Length)
             {
@@ -49,6 +50,7 @@ namespace Sojj.Services
             }
 
             testCaseResult.Status = JudgeStatus.STATUS_ACCEPTED;
+            testCaseResult.Score = testCase.Score;
 
             return Task.FromResult(testCaseResult);
         }
