@@ -62,7 +62,6 @@ namespace Sojj.Services
             await this.sandboxService.DeleteFileAsync(inputId!);
             await this.sandboxService.DeleteFileAsync(outputId!);
             await this.sandboxService.DeleteFileAsync(validId!);
-            await this.sandboxService.DeleteFileAsync(compileResult.OutputFileId);
 
             testCase.MemoryLimit = testCaseMemoryLimit;
             testCase.TimeLimit = testCaseTimeLimit;
