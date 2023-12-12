@@ -14,7 +14,7 @@ public class Worker : BackgroundService
     private readonly IConfiguration configuration;
     private readonly ISandboxService sandboxService;
     private readonly IProblemService problemService;
-    private readonly IEnumerable<IValidatorService> validatorServices;
+    private readonly List<IValidatorService> validatorServices;
 
     public Worker(ILogger<Worker> logger,
         IConfiguration configuration,
@@ -30,7 +30,11 @@ public class Worker : BackgroundService
         this.cacheService = cacheService;
         this.sandboxService = sandboxService;
         this.problemService = problemService;
-        this.validatorServices = validatorServices;
+        this.validatorServices = validatorServices.OrderBy(x => x.Type).ToList();
+        if (this.validatorServices.Count != (int)ValidatorType.CustomValidator)
+        {
+            throw new Exception("Not all validator registered");
+        }
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -148,7 +152,8 @@ public class Worker : BackgroundService
 
             if (testCaseResult.Status.Equals(JudgeStatus.STATUS_ACCEPTED))
             {
-                testCaseResult = await this.validatorServices.First(x => x.Type.Equals(testCase.ValidatorType)).ValidateAsync(testCase, testCaseResult);
+                this.logger.LogInformation("Validating test case {testCaseId} using {validatorType}", testCase.CaseNumber, testCase.ValidatorType);
+                testCaseResult = await this.validatorServices[((int)testCase.ValidatorType) - 1].ValidateAsync(testCase, testCaseResult);
             }
 
             var testCaseResponse = new JudgeProcessResponse

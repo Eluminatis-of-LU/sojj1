@@ -54,8 +54,8 @@ namespace Sojj.Services
                 { "output.txt", new SandboxPreparedFile { FileId = outputId } }
             };
 
-            testCase.MemoryLimit = this.memoryLimitForRuns;
-            testCase.TimeLimit = this.cpuLimitForRuns;
+            testCase.MemoryLimit = this.memoryLimitForRuns * Constants.ByteInMegaByte;
+            testCase.TimeLimit = this.cpuLimitForRuns * Constants.NanoSecondInSecond;
 
             var runResult = await this.sandboxService.RunAsync(testCase, compileResult, copyIn);
 

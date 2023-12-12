@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Sojj;
 using Sojj.Services;
 using Sojj.Services.Contracts;
@@ -12,9 +13,15 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<ICacheService, CacheService>();
         services.AddSingleton<IProblemService, ProblemServices>();
         services.AddSingleton<ISandboxService, SandboxService>();
+        services.AddKeyedSingleton<IValidatorService, FileValidatorService>(ValidatorType.FileValidator);
+        services.AddKeyedSingleton<IValidatorService, WordValidatorService>(ValidatorType.WordValidator);
+        services.AddKeyedSingleton<IValidatorService, LineValidatorService>(ValidatorType.LineValidator);
+        services.AddKeyedSingleton<IValidatorService, FloatValidatorService>(ValidatorType.FloatValidator);
+        services.AddKeyedSingleton<IValidatorService, CustomValidatorService>(ValidatorType.CustomValidator);
         services.AddSingleton<IValidatorService, FileValidatorService>();
         services.AddSingleton<IValidatorService, WordValidatorService>();
         services.AddSingleton<IValidatorService, LineValidatorService>();
+        services.AddSingleton<IValidatorService, FloatValidatorService>();
         services.AddSingleton<IValidatorService, CustomValidatorService>();
 
         services.AddApplicationInsightsTelemetryWorkerService();
