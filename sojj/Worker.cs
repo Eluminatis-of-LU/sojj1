@@ -35,8 +35,6 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await cacheService.InvalidateCacheAsync();
-
         await UpdateProblemDataAsync();
         
         var buffer = WebSocket.CreateClientBuffer(1024 * 4, 1024 * 4);
