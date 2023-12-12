@@ -4,9 +4,9 @@ public class TestCase
 {
     public int CaseNumber { get; set; }
 
-    public string Input { get; set; }
+    public string? Input { get; set; }
 
-    public string Output { get; set; }
+    public string? Output { get; set; }
 
     public int Score { get; set; }
 
@@ -23,4 +23,8 @@ public class TestCase
     public string? ValidatorSourceCode { get; set; }
 
     public string? ValidatorLanguage { get; set; }
+
+    public string DomainId { get; internal set; }
+
+    public string ProblemId { get; internal set; }
 }

@@ -1,4 +1,5 @@
-﻿using Sojj.Dtos;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Sojj.Dtos;
 using Sojj.Services.Contracts;
 
 namespace Sojj.Services
@@ -12,14 +13,16 @@ namespace Sojj.Services
         private readonly IConfiguration configuration;
         private readonly long memoryLimitForRuns;
         private readonly long cpuLimitForRuns;
+        private readonly IMemoryCache cache;
 
-        public CustomValidatorService(ILogger<CustomValidatorService> logger, ISandboxService sandboxService, IConfiguration configuration)
+        public CustomValidatorService(ILogger<CustomValidatorService> logger, ISandboxService sandboxService, IConfiguration configuration, IMemoryCache cache)
         {
             this.logger = logger;
             this.sandboxService = sandboxService;
             this.configuration = configuration;
             this.memoryLimitForRuns = this.configuration.GetValue<long>("MemoryLimitForRuns");
             this.cpuLimitForRuns = this.configuration.GetValue<long>("CpuLimitForRuns");
+            this.cache = cache;
         }
 
         public async Task<TestCaseResult> ValidateAsync(TestCase testCase, TestCaseResult testCaseResult)
@@ -39,7 +42,11 @@ namespace Sojj.Services
         private async Task<TestCaseResult> TryValidateAsync(TestCase testCase, TestCaseResult testCaseResult)
         {
             string runId = Guid.NewGuid().ToString();
-            var compileResult = await this.sandboxService.CompileAsync(testCase.ValidatorSourceCode!, runId, testCase.ValidatorLanguage!);
+            var compileResult = await cache.GetOrCreateAsync($"{testCase.DomainId}+{testCase.ProblemId}", async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(25);
+                return await this.sandboxService.CompileAsync(testCase.ValidatorSourceCode!, runId, testCase.ValidatorLanguage!);
+            });
             var inputId = await this.sandboxService.UploadFileAsync("input.txt", testCase.Input);
             var validId = await this.sandboxService.UploadFileAsync("valid.txt", testCase.Output);
             var outputId = await this.sandboxService.UploadFileAsync("output.txt", testCaseResult.Output);

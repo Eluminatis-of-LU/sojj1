@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using Sojj;
 using Sojj.Services;
 using Sojj.Services.Contracts;
@@ -23,6 +22,8 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IValidatorService, LineValidatorService>();
         services.AddSingleton<IValidatorService, FloatValidatorService>();
         services.AddSingleton<IValidatorService, CustomValidatorService>();
+
+        services.AddMemoryCache();
 
         services.AddApplicationInsightsTelemetryWorkerService();
     })

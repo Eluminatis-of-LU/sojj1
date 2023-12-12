@@ -53,6 +53,8 @@ public class ProblemServices : IProblemService
                 Epsilon = testCaseConfig.Epsilon,
                 ValidatorSourceCode = testCaseConfig.ValidatorSourceCode,
                 ValidatorLanguage = testCaseConfig.ValidatorLanguage,
+                DomainId = domainId,
+                ProblemId = problemId
             };
         }
     }
