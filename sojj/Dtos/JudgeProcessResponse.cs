@@ -14,7 +14,8 @@ public class JudgeProcessResponse
     public JudgeStatus Status { get; set; }
 
     [JsonPropertyName("case")]
-    public JudgeProcessResponseCase Case { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public JudgeProcessResponseCase? Case { get; set; }
 
     [JsonPropertyName("progress")]
     public float Progress { get; set; }
@@ -27,6 +28,14 @@ public class JudgeProcessResponse
 
     [JsonPropertyName("memory_kb")]
     public float MemoryInKiloBytes { get; internal set; }
+
+    [JsonPropertyName("judge_text")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? JudgeText { get; internal set; }
+
+    [JsonPropertyName("compiler_text")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? CompilerText { get; internal set; }
 }
 
 public class JudgeProcessResponseCase
@@ -44,5 +53,5 @@ public class JudgeProcessResponseCase
     public float MemoryInKiloBytes { get; set; }
 
     [JsonPropertyName("judge_text")]
-    public string JudgeText { get; set; }
+    public string? JudgeText { get; set; }
 }
