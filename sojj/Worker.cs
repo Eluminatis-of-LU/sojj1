@@ -123,6 +123,13 @@ public class Worker : BackgroundService
         {
             await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new JudgeProcessResponse
             {
+                Key = "next",
+                Tag = messageDto.Tag,
+                Status = JudgeStatus.STATUS_COMPILE_ERROR,
+                CompilerText = compileResult.Message,
+            })), WebSocketMessageType.Text, true, stoppingToken);
+            await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new JudgeProcessResponse
+            {
                 Key = "end",
                 Tag = messageDto.Tag,
                 Status = JudgeStatus.STATUS_COMPILE_ERROR,

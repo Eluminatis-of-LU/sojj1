@@ -90,6 +90,10 @@ public class SandboxService : ISandboxService
                         Env = this.sandboxEnvironment,
                         Files = new SandboxFile[]
                         {
+                            new SandboxMemoryFile
+                            {
+                                Content = string.Empty,
+                            },
                             new SandboxCollectorFile
                             {
                                 Name = Constants.Stdout,
