@@ -28,24 +28,29 @@ public class SandboxService : ISandboxService
     {
         this.logger = logger;
         this.configuration = configuration;
-        baseUrl = new Uri(this.configuration.GetValue<string>("SandboxUrl") ?? throw new ArgumentNullException("SandboxUrl"));
+        baseUrl = new Uri(this.configuration.GetValue<string>("SandboxUrl") ?? throw new MissingFieldException("SandboxUrl"));
         var retryPolicy = HttpPolicyExtensions
             .HandleTransientHttpError()
             .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
-        var socketHandler = new SocketsHttpHandler { PooledConnectionLifetime = TimeSpan.FromMinutes(15) };
-        socketHandler.CookieContainer = new CookieContainer();
+        var socketHandler = new SocketsHttpHandler
+        {
+            PooledConnectionLifetime = TimeSpan.FromMinutes(15),
+            CookieContainer = new CookieContainer()
+        };
         var pollyHandler = new PolicyHttpMessageHandler(retryPolicy)
         {
             InnerHandler = socketHandler,
         };
 
-        httpClient = new HttpClient(pollyHandler);
-        httpClient.BaseAddress = baseUrl;
-        languageFilePath = this.configuration.GetValue<string>("LanguageFilePath") ?? throw new ArgumentNullException("LanguageFilePath");
+        httpClient = new HttpClient(pollyHandler)
+        {
+            BaseAddress = baseUrl
+        };
+        languageFilePath = this.configuration.GetValue<string>("LanguageFilePath") ?? throw new MissingFieldException("LanguageFilePath");
         using var stream = File.OpenRead(languageFilePath);
-        languages = JsonSerializer.Deserialize<Dictionary<string, Language>>(stream);
-        this.sandboxEnvironment = this.configuration.GetSection("SandboxEnvironment").Get<string[]>() ?? throw new ArgumentNullException("SandboxEnvironment");
+        languages = JsonSerializer.Deserialize<Dictionary<string, Language>>(stream)!;
+        this.sandboxEnvironment = this.configuration.GetSection("SandboxEnvironment").Get<string[]>() ?? throw new MissingFieldException("SandboxEnvironment");
         this.processLimitForRuns = this.configuration.GetValue<int>("ProcessLimitForRuns");
         this.memoryLimitForRuns = this.configuration.GetValue<long>("MemoryLimitForRuns");
         this.cpuLimitForRuns = this.configuration.GetValue<long>("CpuLimitForRuns");
@@ -82,14 +87,14 @@ public class SandboxService : ISandboxService
         logger.LogInformation("Compiling {runId}", runId);
         var request = new SandboxRunRequest
         {
-            Commands = new Command[]
-            {
+            Commands =
+            [
                     new Command
                     {
                         Args = languageInfo.Compile,
                         Env = this.sandboxEnvironment,
-                        Files = new SandboxFile[]
-                        {
+                        Files =
+                        [
                             new SandboxMemoryFile
                             {
                                 Content = string.Empty,
@@ -104,7 +109,7 @@ public class SandboxService : ISandboxService
                                 Name = Constants.Stderr,
                                 Max = this.outputLimitForRuns * Constants.ByteInMegaByte,
                             },
-                        },
+                        ],
                         CpuLimit = this.cpuLimitForRuns * Constants.NanoSecondInSecond,
                         MemoryLimit = this.memoryLimitForRuns * Constants.ByteInMegaByte,
                         ProcessLimit = this.processLimitForRuns,
@@ -112,10 +117,10 @@ public class SandboxService : ISandboxService
                         {
                             { languageInfo.CodeFile, new SandboxMemoryFile { Content = sourceCode } },
                         },
-                        CopyOut = new string[] { Constants.Stdout, Constants.Stderr },
-                        CopyOutCached = new string[] { languageInfo.CodeFile, languageInfo.OutputFile },
+                        CopyOut = [Constants.Stdout, Constants.Stderr],
+                        CopyOutCached = [languageInfo.CodeFile, languageInfo.OutputFile],
                     }
-            },
+            ],
         };
         logger.LogDebug("Compile request: {request}", JsonSerializer.Serialize(request));
         logger.LogInformation("Compiling {runId}", runId);
@@ -193,24 +198,20 @@ public class SandboxService : ISandboxService
         }
     }
 
-    public async Task<TestCaseResult> RunAsync(TestCase testCase, CompileResult compileResult, Dictionary<string, SandboxFile> copyIn)
+    public async Task<TestCaseResult> RunAsync(TestCase testCase, CompileResult compileResult, Dictionary<string, SandboxFile>? copyIn)
     {
-        if (copyIn == null)
-        {
-            copyIn = new Dictionary<string, SandboxFile>();
-        }
+        copyIn ??= [];
 
         copyIn.Add(compileResult.OutputFile, new SandboxPreparedFile { FileId = compileResult.OutputFileId });
         var request = new SandboxRunRequest
         {
-            Commands = new Command[]
-            {
-                    new Command
-                    {
+            Commands =
+            [
+                    new() {
                         Args = compileResult.ExecuteArgs,
                         Env = this.sandboxEnvironment,
-                        Files = new SandboxFile[]
-                        {
+                        Files =
+                        [
                             new SandboxMemoryFile
                             {
                                 Content = testCase.Input,
@@ -225,14 +226,14 @@ public class SandboxService : ISandboxService
                                 Name = Constants.Stderr,
                                 Max = this.outputLimitForRuns * Constants.ByteInMegaByte,
                             },
-                        },
+                        ],
                         CpuLimit = testCase.TimeLimit,
                         MemoryLimit = testCase.MemoryLimit,
                         ProcessLimit = this.processLimitForRuns,
                         CopyIn = copyIn,
-                        CopyOut = new string[] { Constants.Stdout, Constants.Stderr },
+                        CopyOut = [Constants.Stdout, Constants.Stderr],
                     }
-            },
+            ],
         };
 
         logger.LogDebug("Run request: {request}", JsonSerializer.Serialize(request));
@@ -301,8 +302,10 @@ public class SandboxService : ISandboxService
 
     public async Task<string?> UploadFileAsync(string fileName, string fileContent)
     {
-        var formData = new MultipartFormDataContent();
-        formData.Add(new StringContent(fileContent), "file", fileName);
+        var formData = new MultipartFormDataContent
+        {
+            { new StringContent(fileContent), "file", fileName }
+        };
         var response = await httpClient.PostAsync("/file", formData);
         if (!response.IsSuccessStatusCode)
         {

@@ -11,13 +11,11 @@ public class Worker : BackgroundService
     private readonly ILogger<Worker> logger;
     private readonly IJudgeService judgeService;
     private readonly ICacheService cacheService;
-    private readonly IConfiguration configuration;
     private readonly ISandboxService sandboxService;
     private readonly IProblemService problemService;
     private readonly List<IValidatorService> validatorServices;
 
     public Worker(ILogger<Worker> logger,
-        IConfiguration configuration,
         IJudgeService judgeService,
         ICacheService cacheService,
         ISandboxService sandboxService,
@@ -25,12 +23,11 @@ public class Worker : BackgroundService
         IEnumerable<IValidatorService> validatorServices)
     {
         this.logger = logger;
-        this.configuration = configuration;
         this.judgeService = judgeService;
         this.cacheService = cacheService;
         this.sandboxService = sandboxService;
         this.problemService = problemService;
-        this.validatorServices = validatorServices.OrderBy(x => x.Type).ToList();
+        this.validatorServices = [.. validatorServices.OrderBy(x => x.Type)];
         if (this.validatorServices.Count != (int)ValidatorType.CustomValidator)
         {
             throw new Exception("Not all validator registered");
@@ -74,7 +71,7 @@ public class Worker : BackgroundService
                     continue;
                 }
 
-                await TryProcessMessageAsync(messageDto, ws, stoppingToken);
+                await TryProcessMessageAsync(messageDto!, ws, stoppingToken);
             }
 
             await Task.Delay(1000, stoppingToken);
@@ -117,7 +114,7 @@ public class Worker : BackgroundService
 
         if (compileResult.Status == JudgeStatus.STATUS_ACCEPTED)
         {
-            await ExecuteAndGradeAsync(messageDto, ws, stoppingToken, compileResult);
+            await ExecuteAndGradeAsync(messageDto, ws, compileResult, stoppingToken);
         }
         else
         {
@@ -143,7 +140,7 @@ public class Worker : BackgroundService
         }
     }
 
-    private async Task ExecuteAndGradeAsync(JudgeProcessRequest messageDto, ClientWebSocket ws, CancellationToken stoppingToken, CompileResult compileResult)
+    private async Task ExecuteAndGradeAsync(JudgeProcessRequest messageDto, ClientWebSocket ws, CompileResult compileResult, CancellationToken stoppingToken)
     {
         int totalScore = 0;
         int problemStatus = (int)JudgeStatus.STATUS_ACCEPTED;
@@ -211,12 +208,12 @@ public class Worker : BackgroundService
         return problemService.GetTestCasesAsync(messageDto.ProblemId, messageDto.DomainId);
     }
 
-    private bool TryParseMessageDto(string message, out JudgeProcessRequest messageDto)
+    private static bool TryParseMessageDto(string message, out JudgeProcessRequest? messageDto)
     {
         try
         {
             messageDto = JsonSerializer.Deserialize<JudgeProcessRequest>(message);
-            return true;
+            return messageDto != null;
         }
         catch (Exception)
         {
@@ -230,9 +227,14 @@ public class Worker : BackgroundService
         await judgeService.EnsureLoggedinAsync();
         int lastUpdateAt = await cacheService.GetCacheUpdateTimeAsync();
         var dataList = await judgeService.GetDataListAsync(lastUpdateAt);
+        if (dataList == null || dataList.Problems == null)
+        {
+            logger.LogInformation("No problem data updated");
+            return;
+        }
         foreach (var problem in dataList.Problems)
         {
-            string problemId = problem.ProblemId.ToString();
+            string problemId = problem.ProblemId.ToString()!;
             logger.LogInformation("Problem {problemId} updated at {dommainId}", problemId, problem.DomainId);
             var zipData = await judgeService.GetProblemDataAsync(problemId, problem.DomainId);
             if (zipData == null)
