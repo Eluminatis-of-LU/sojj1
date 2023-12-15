@@ -55,7 +55,7 @@ public class Worker : BackgroundService
 
                 do {
                     webSocketReceiveResult = await ws.ReceiveAsync(buffer, stoppingToken);
-                    message += Encoding.UTF8.GetString(buffer.Array, 0, webSocketReceiveResult.Count);
+                    message += Encoding.UTF8.GetString(buffer.Array!, 0, webSocketReceiveResult.Count);
                 } while (webSocketReceiveResult.MessageType != WebSocketMessageType.Close && !webSocketReceiveResult.EndOfMessage);
 
                 if (webSocketReceiveResult.MessageType == WebSocketMessageType.Close)
@@ -213,7 +213,7 @@ public class Worker : BackgroundService
         try
         {
             messageDto = JsonSerializer.Deserialize<JudgeProcessRequest>(message);
-            return messageDto != null;
+            return messageDto is not null;
         }
         catch (Exception)
         {
