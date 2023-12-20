@@ -32,7 +32,10 @@ public class HeartbeatService : BackgroundService
 
         if (!string.IsNullOrWhiteSpace(heartbeatCheckinUrlString))
         {
-            var pollyHandler = new PolicyHttpMessageHandler(RetryPolicy.GetRetryPolicy());
+            var pollyHandler = new PolicyHttpMessageHandler(RetryPolicy.GetRetryPolicy())
+            {
+                InnerHandler = new HttpClientHandler(),
+            };
             this.heartBeatCheckinClient = new HttpClient(pollyHandler);
             var heartbeatCheckinUrl = new Uri(heartbeatCheckinUrlString);
             this.heartBeatCheckinClient.BaseAddress = heartbeatCheckinUrl;
