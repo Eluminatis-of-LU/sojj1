@@ -1,4 +1,7 @@
-﻿using Sojj.Services.Contracts;
+﻿using Microsoft.Extensions.Http;
+using Polly;
+using Polly.Extensions.Http;
+using Sojj.Services.Contracts;
 
 namespace Sojj.Services;
 
@@ -29,7 +32,8 @@ public class HeartbeatService : BackgroundService
 
         if (!string.IsNullOrWhiteSpace(heartbeatCheckinUrlString))
         {
-            this.heartBeatCheckinClient = new HttpClient();
+            var pollyHandler = new PolicyHttpMessageHandler(RetryPolicy.GetRetryPolicy());
+            this.heartBeatCheckinClient = new HttpClient(pollyHandler);
             var heartbeatCheckinUrl = new Uri(heartbeatCheckinUrlString);
             this.heartBeatCheckinClient.BaseAddress = heartbeatCheckinUrl;
         }
@@ -61,7 +65,7 @@ public class HeartbeatService : BackgroundService
         {
             return;
         }
-        
+
         var response = await heartBeatCheckinClient.GetAsync(string.Empty);
 
         if (response.IsSuccessStatusCode)

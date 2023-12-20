@@ -28,13 +28,9 @@ internal class JudgeService : IJudgeService
         username = this.configuration.GetValue<string>("JudgeService:Username") ?? throw new ArgumentNullException("JudgeService:Username");
         password = this.configuration.GetValue<string>("JudgeService:Password") ?? throw new ArgumentNullException("JudgeService:Password");
         baseUrl = new Uri(this.configuration.GetValue<string>("JudgeService:BaseUrl") ?? throw new ArgumentNullException("JudgeService:BaseUrl"));
-        var retryPolicy = HttpPolicyExtensions
-            .HandleTransientHttpError()
-            .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-
         var socketHandler = new SocketsHttpHandler { PooledConnectionLifetime = TimeSpan.FromMinutes(15) };
         socketHandler.CookieContainer = new CookieContainer();
-        var pollyHandler = new PolicyHttpMessageHandler(retryPolicy)
+        var pollyHandler = new PolicyHttpMessageHandler(RetryPolicy.GetRetryPolicy())
         {
             InnerHandler = socketHandler,
         };

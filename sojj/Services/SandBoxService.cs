@@ -29,16 +29,13 @@ public class SandboxService : ISandboxService
         this.logger = logger;
         this.configuration = configuration;
         baseUrl = new Uri(this.configuration.GetValue<string>("SandboxUrl") ?? throw new MissingFieldException("SandboxUrl"));
-        var retryPolicy = HttpPolicyExtensions
-            .HandleTransientHttpError()
-            .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         var socketHandler = new SocketsHttpHandler
         {
             PooledConnectionLifetime = TimeSpan.FromMinutes(15),
             CookieContainer = new CookieContainer()
         };
-        var pollyHandler = new PolicyHttpMessageHandler(retryPolicy)
+        var pollyHandler = new PolicyHttpMessageHandler(RetryPolicy.GetRetryPolicy())
         {
             InnerHandler = socketHandler,
         };
@@ -107,7 +104,7 @@ public class SandboxService : ISandboxService
                             new SandboxCollectorFile
                             {
                                 Name = Constants.Stderr,
-                                Max = this.outputLimitForRuns * Constants.ByteInMegaByte,
+                                Max = this.outputLimitForRuns * Constants.ByteInKiloByte,
                             },
                         ],
                         CpuLimit = this.cpuLimitForRuns * Constants.NanoSecondInSecond,
@@ -177,7 +174,7 @@ public class SandboxService : ISandboxService
         return new CompileResult
         {
             Status = JudgeStatus.STATUS_ACCEPTED,
-            Message = compileResult.Files[Constants.Stdout],
+            Message = compileResult.Files[Constants.Stderr],
             ExecuteArgs = languageInfo.Execute,
             Language = language,
             RunId = runId,
@@ -224,7 +221,7 @@ public class SandboxService : ISandboxService
                             new SandboxCollectorFile
                             {
                                 Name = Constants.Stderr,
-                                Max = this.outputLimitForRuns * Constants.ByteInMegaByte,
+                                Max = this.outputLimitForRuns * Constants.ByteInKiloByte,
                             },
                         ],
                         CpuLimit = testCase.TimeLimit,
