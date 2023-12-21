@@ -72,9 +72,11 @@ public class Worker : BackgroundService
                     continue;
                 }
 
-                GlobalLogContext.PushProperty("RunId", messageDto!.RunId);
+                GlobalLogContext.PushProperty("CorrelationId", Guid.NewGuid());
+                GlobalLogContext.PushProperty("runId", messageDto!.RunId);
                 await TryProcessMessageAsync(messageDto, ws, stoppingToken);
-                GlobalLogContext.PushProperty("RunId", null);
+                GlobalLogContext.PushProperty("runId", null);
+                GlobalLogContext.PushProperty("CorrelationId", null);
             }
 
             await Task.Delay(1000, stoppingToken);
@@ -159,6 +161,7 @@ public class Worker : BackgroundService
             {
                 this.logger.LogInformation("Validating test case {testCaseId} using {validatorType}", testCase.CaseNumber, testCase.ValidatorType);
                 testCaseResult = await this.validatorServices[((int)testCase.ValidatorType) - 1].ValidateAsync(testCase, testCaseResult);
+                this.logger.LogInformation("Validated test case {testCaseId} using {validatorType} {ProcessedTestCase}", testCase.CaseNumber, testCase.ValidatorType, true);
             }
 
             var testCaseResponse = new JudgeProcessResponse
@@ -198,8 +201,8 @@ public class Worker : BackgroundService
 
         await this.sandboxService.DeleteFileAsync(compileResult.OutputFileId);
 
-        logger.LogInformation("Procesed Compiled language for {runId} {language} {problemId} {domainId}",
-                                   messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId);
+        logger.LogInformation("Graded problem for: {runId} {language} {problemId} {domainId} {ProcessedProblemSubmission}",
+                                   messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId, true);
     }
 
     private IAsyncEnumerable<TestCase> GetTestCasesAsync(JudgeProcessRequest messageDto)
@@ -238,11 +241,11 @@ public class Worker : BackgroundService
         foreach (var problem in dataList.Problems)
         {
             string problemId = problem.ProblemId.ToString()!;
-            logger.LogInformation("Problem {problemId} updated at {dommainId}", problemId, problem.DomainId);
+            logger.LogInformation("Problem {problemId} updated at {domainId}", problemId, problem.DomainId);
             var zipData = await judgeService.GetProblemDataAsync(problemId, problem.DomainId);
             if (zipData == null)
             {
-                logger.LogError("Problem data not found for {problemid}, {dommainId}", problemId, problem.DomainId);
+                logger.LogError("Problem data not found for {problemid}, {domainId}", problemId, problem.DomainId);
                 continue;
             }
 
