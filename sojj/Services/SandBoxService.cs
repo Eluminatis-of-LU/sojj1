@@ -241,7 +241,7 @@ public class SandboxService : ISandboxService
 
         if (!response.IsSuccessStatusCode)
         {
-            logger.LogError("Run failed: {statusCode}", response.StatusCode);
+            logger.LogError("Run failed: sandbox returned statusCode-> {statusCode}", response.StatusCode);
             return new TestCaseResult
             {
                 Status = JudgeStatus.STATUS_SYSTEM_ERROR,
@@ -273,7 +273,7 @@ public class SandboxService : ISandboxService
 
         if (runResult.Status != Constants.Accepted)
         {
-            logger.LogError("Run failed: {status}", runResult.Status);
+            logger.LogInformation("Run failed: {status}", runResult.Status);
             return new TestCaseResult
             {
                 Status = runResult.Status.ToJudgeStatus(),
