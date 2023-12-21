@@ -1,3 +1,4 @@
+using Serilog.Context;
 using Sojj.Dtos;
 using Sojj.Services.Contracts;
 using System.Net.WebSockets;
@@ -71,7 +72,9 @@ public class Worker : BackgroundService
                     continue;
                 }
 
-                await TryProcessMessageAsync(messageDto!, ws, stoppingToken);
+                GlobalLogContext.PushProperty("RunId", messageDto!.RunId);
+                await TryProcessMessageAsync(messageDto, ws, stoppingToken);
+                GlobalLogContext.PushProperty("RunId", null);
             }
 
             await Task.Delay(1000, stoppingToken);
@@ -148,7 +151,7 @@ public class Worker : BackgroundService
         long totalTime = 0;
         await foreach (TestCase testCase in this.GetTestCasesAsync(messageDto))
         {
-            logger.LogInformation("Running test case {testCase.CaseNumber}", testCase.CaseNumber);
+            logger.LogInformation("Running test case {TestCaseNumber}", testCase.CaseNumber);
 
             var testCaseResult = await sandboxService.RunAsync(testCase, compileResult);
 

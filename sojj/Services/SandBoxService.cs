@@ -81,7 +81,7 @@ public class SandboxService : ISandboxService
             };
         }
 
-        logger.LogInformation("Compiling {runId}", runId);
+        logger.LogInformation("Language {language} found", language);
         var request = new SandboxRunRequest
         {
             Commands =
@@ -120,7 +120,7 @@ public class SandboxService : ISandboxService
             ],
         };
         logger.LogDebug("Compile request: {request}", JsonSerializer.Serialize(request));
-        logger.LogInformation("Compiling {runId}", runId);
+        logger.LogInformation("Compiling {language}", language);
         var response = await httpClient.PostAsJsonAsync("/run", request);
 
         if (!response.IsSuccessStatusCode)
@@ -235,7 +235,7 @@ public class SandboxService : ISandboxService
 
         logger.LogDebug("Run request: {request}", JsonSerializer.Serialize(request));
 
-        logger.LogInformation("Running test case {testCase.CaseNumber}", testCase.CaseNumber);
+        logger.LogInformation("Running test case {TestCaseNumber}", testCase.CaseNumber);
 
         var response = await httpClient.PostAsJsonAsync("/run", request);
 
@@ -254,7 +254,7 @@ public class SandboxService : ISandboxService
 
         logger.LogDebug("Run result: {content}", content);
 
-        logger.LogInformation("Running finished test case {testCase.CaseNumber} done", testCase.CaseNumber);
+        logger.LogInformation("Running finished test case {TestCaseNumber} done", testCase.CaseNumber);
 
         var result = JsonSerializer.Deserialize<SandboxRunResult[]>(content);
 

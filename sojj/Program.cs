@@ -1,3 +1,4 @@
+using Serilog;
 using Sojj;
 using Sojj.Services;
 using Sojj.Services.Contracts;
@@ -24,9 +25,9 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IValidatorService, CustomValidatorService>();
 
         services.AddMemoryCache();
-
-        services.AddApplicationInsightsTelemetryWorkerService();
     })
+    .UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration
+           .ReadFrom.Configuration(hostingContext.Configuration))
     .Build();
 
 host.Run();
