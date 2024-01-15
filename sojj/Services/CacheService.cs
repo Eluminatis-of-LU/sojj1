@@ -1,4 +1,5 @@
-﻿using Sojj.Services.Contracts;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Sojj.Services.Contracts;
 using System.IO.Compression;
 
 namespace Sojj.Services;
@@ -8,12 +9,14 @@ public class CacheService : ICacheService
     private readonly ILogger<CacheService> logger;
     private readonly IConfiguration configuration;
     private readonly string cacheLocation;
+    private readonly IMemoryCache memoryCache;
 
-    public CacheService(ILogger<CacheService> logger, IConfiguration configuration)
+    public CacheService(ILogger<CacheService> logger, IConfiguration configuration, IMemoryCache memoryCache)
     {
         this.logger = logger;
         this.configuration = configuration;
         cacheLocation = this.configuration["JudgeService:CacheLocation"] ?? throw new ArgumentNullException("CacheLocation");
+        this.memoryCache = memoryCache;
     }
 
     public async Task<int> GetCacheUpdateTimeAsync()
@@ -50,6 +53,7 @@ public class CacheService : ICacheService
         string path = Path.Combine(cacheLocation, domainId, problemId);
         Directory.CreateDirectory(path);
         Directory.Delete(path, true);
+        this.memoryCache.Remove($"{domainId}-{problemId}");
         return Task.CompletedTask;
     }
 

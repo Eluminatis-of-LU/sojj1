@@ -42,7 +42,7 @@ namespace Sojj.Services
         private async Task<TestCaseResult> TryValidateAsync(TestCase testCase, TestCaseResult testCaseResult)
         {
             string runId = Guid.NewGuid().ToString();
-            var compileResult = await cache.GetOrCreateAsync($"{testCase.DomainId}+{testCase.ProblemId}", async entry =>
+            var compileResult = await cache.GetOrCreateAsync($"{testCase.DomainId}-{testCase.ProblemId}", async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(25);
                 return await this.sandboxService.CompileAsync(testCase.ValidatorSourceCode!, runId, testCase.ValidatorLanguage!);
