@@ -145,7 +145,7 @@ internal class JudgeService : IJudgeService
         }
         else
         {
-            logger.LogError("Loging failed");
+            logger.LogError("Login failed");
         }
     }
 
