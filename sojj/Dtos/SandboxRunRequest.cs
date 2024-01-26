@@ -19,6 +19,9 @@ public class Command
     [JsonPropertyName("files")]
     public SandboxFile[]? Files { get; set; }
 
+    [JsonPropertyName("clockLimit")]
+    public long? ClockLimit { get; set; }
+
     [JsonPropertyName("cpuLimit")]
     public long? CpuLimit { get; set; }
 

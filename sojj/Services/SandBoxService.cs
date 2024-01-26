@@ -108,6 +108,7 @@ public class SandboxService : ISandboxService
                             },
                         ],
                         CpuLimit = this.cpuLimitForRuns * Constants.NanoSecondInSecond,
+                        ClockLimit = (this.cpuLimitForRuns * Constants.NanoSecondInSecond) * 3,
                         MemoryLimit = this.memoryLimitForRuns * Constants.ByteInMegaByte,
                         ProcessLimit = this.processLimitForRuns,
                         CopyIn = new Dictionary<string, SandboxFile>
@@ -225,6 +226,7 @@ public class SandboxService : ISandboxService
                             },
                         ],
                         CpuLimit = testCase.TimeLimit,
+                        ClockLimit = testCase.TimeLimit * 3,
                         MemoryLimit = testCase.MemoryLimit,
                         ProcessLimit = this.processLimitForRuns,
                         CopyIn = copyIn,
