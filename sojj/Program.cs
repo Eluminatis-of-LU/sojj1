@@ -1,14 +1,16 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Serilog;
 using Sojj;
+using Sojj.HealthChecks;
 using Sojj.Services;
 using Sojj.Services.Contracts;
 
 
 IHost host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices(services =>
+    .ConfigureServices((context, services) =>
     {
         services.AddHostedService<Worker>();
-        services.AddHostedService<HeartbeatService>();
         services.AddSingleton<IJudgeService, JudgeService>();
         services.AddSingleton<ICacheService, CacheService>();
         services.AddSingleton<IProblemService, ProblemServices>();
@@ -23,6 +25,24 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IValidatorService, LineValidatorService>();
         services.AddSingleton<IValidatorService, FloatValidatorService>();
         services.AddSingleton<IValidatorService, CustomValidatorService>();
+
+        services.AddHealthChecks()
+            .AddCheck<JudgeServiceHealthCheck>("JudgeServiceHealthCheck")
+            .AddCheck<SandboxServiceHealthCheck>("SandboxServiceHealthCheck");
+
+        services.AddHttpClient(Constants.HeartbeatCheckinClient, (client) =>
+        {
+            client.BaseAddress = new Uri(context.Configuration.GetValue<string>("HeartbeatCheckinUrl"));
+        })
+            .AddPolicyHandler(RetryPolicy.GetRetryPolicy());
+
+        services.Configure<HealthCheckPublisherOptions>(options =>
+        {
+            options.Delay = TimeSpan.FromSeconds(10);
+            options.Period = TimeSpan.FromSeconds(context.Configuration.GetValue<long>("HeartbeatIntervalInSeconds", 60));
+        });
+
+        services.AddSingleton<IHealthCheckPublisher, HealthCheckPublisher>();
 
         services.AddMemoryCache();
     })

@@ -1,4 +1,5 @@
-﻿namespace Sojj;
+﻿
+namespace Sojj;
 
 public static class Constants
 {
@@ -24,4 +25,5 @@ public static class Constants
     public const string FileError = "File Error";
     public const string Signalled = "Signalled";
     public const string InternalError = "Internal Error";
+    public const string HeartbeatCheckinClient = "HeartbeatCheckinClient";
 }
