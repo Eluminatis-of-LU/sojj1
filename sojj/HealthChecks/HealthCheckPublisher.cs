@@ -10,11 +10,15 @@ public class HealthCheckPublisher : IHealthCheckPublisher
 {
     private readonly ILogger<HealthCheckPublisher> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly string _healthCheckFilePath;
 
-    public HealthCheckPublisher(ILogger<HealthCheckPublisher> logger, IHttpClientFactory httpClientFactory)
+    public HealthCheckPublisher(ILogger<HealthCheckPublisher> logger, IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
+        var healthCheckFilePathString = configuration.GetValue<string>("HealthCheckFilePath") ?? throw new ArgumentNullException("HealthCheckFilePath");
+        Directory.CreateDirectory(healthCheckFilePathString);
+        _healthCheckFilePath = Path.Join(healthCheckFilePathString, Environment.MachineName);
     }
 
     public async Task PublishAsync(HealthReport report, CancellationToken cancellationToken)
@@ -29,8 +33,11 @@ public class HealthCheckPublisher : IHealthCheckPublisher
 
         if (report.Status != HealthStatus.Healthy)
         {
+            File.Delete(_healthCheckFilePath);
             return;
         }
+
+        File.Create(_healthCheckFilePath).Dispose();
 
         var response = await httpClient.GetAsync(string.Empty, cancellationToken);
 
