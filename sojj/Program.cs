@@ -9,7 +9,7 @@ using Sojj.Services.Contracts;
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
-        int numWorkers = context.Configuration.GetValue<int>("NumberOfWorkers", 1);
+        int numWorkers = context.Configuration.GetValue<int>("NumberOfWorkers", Environment.ProcessorCount);
         services.AddKeyedSingleton("workerCacheLock", new SemaphoreSlim(1, 1));
         for (int i = 0; i < numWorkers; i++)
         {
