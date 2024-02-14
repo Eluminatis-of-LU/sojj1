@@ -57,7 +57,7 @@ public class CacheService : ICacheService
         return Task.CompletedTask;
     }
 
-    public async Task WriteCacheAsync(ZipArchive zipData, string domainId, string problemId, int unixTimestamp)
+    public void WriteCache(ZipArchive zipData, string domainId, string problemId)
     {
         logger.LogInformation("Write cache for problem {problemId} in domain {domainId}", problemId, domainId);
         string path = Path.Combine(cacheLocation, domainId, problemId);
@@ -65,6 +65,10 @@ public class CacheService : ICacheService
         Directory.CreateDirectory(path);
         zipData.ExtractToDirectory(path, false);
         logger.LogInformation("Write cache to {path} completed", path);
-        await File.WriteAllTextAsync(Path.Combine(cacheLocation, "cache.txt"), unixTimestamp.ToString());
     }
+
+	public Task UpdateCacheTimeAsync(int unixTimestamp)
+	{
+		return File.WriteAllTextAsync(Path.Combine(cacheLocation, "cache.txt"), unixTimestamp.ToString());
+	}
 }

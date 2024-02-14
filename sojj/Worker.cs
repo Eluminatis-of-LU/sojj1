@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Serilog.Context;
 using Sojj.Dtos;
 using Sojj.Services.Contracts;
@@ -9,31 +10,37 @@ namespace Sojj;
 
 public class Worker : BackgroundService
 {
-    private readonly ILogger<Worker> logger;
-    private readonly IJudgeService judgeService;
-    private readonly ICacheService cacheService;
-    private readonly ISandboxService sandboxService;
-    private readonly IProblemService problemService;
-    private readonly List<IValidatorService> validatorServices;
+    private readonly ILogger<Worker> _logger;
+	private readonly IServiceScope _serviceScope;
+	private readonly IJudgeService _judgeService;
+    private readonly ICacheService _cacheService;
+    private readonly ISandboxService _sandboxService;
+    private readonly IProblemService _problemService;
+    private readonly List<IValidatorService> _validatorServices;
+	private readonly SemaphoreSlim _workerCacheLock;
 
-    public Worker(ILogger<Worker> logger,
-        IJudgeService judgeService,
+	public Worker(ILogger<Worker> logger,
         ICacheService cacheService,
         ISandboxService sandboxService,
         IProblemService problemService,
-        IEnumerable<IValidatorService> validatorServices)
-    {
-        this.logger = logger;
-        this.judgeService = judgeService;
-        this.cacheService = cacheService;
-        this.sandboxService = sandboxService;
-        this.problemService = problemService;
-        this.validatorServices = [.. validatorServices.OrderBy(x => x.Type)];
-        if (this.validatorServices.Count != (int)ValidatorType.CustomValidator)
+        IEnumerable<IValidatorService> validatorServices,
+        [FromKeyedServices("workerCacheLock")] SemaphoreSlim workerCacheLock,
+		IServiceScopeFactory serviceScopeFactory)
+
+	{
+        _logger = logger;
+        _serviceScope = serviceScopeFactory.CreateScope();
+		_judgeService = _serviceScope.ServiceProvider.GetRequiredService<IJudgeService>();
+        _cacheService = cacheService;
+        _sandboxService = sandboxService;
+        _problemService = problemService;
+        _validatorServices = [.. validatorServices.OrderBy(x => x.Type)];
+        if (_validatorServices.Count != (int)ValidatorType.CustomValidator)
         {
             throw new Exception("Not all validator registered");
         }
-    }
+        _workerCacheLock = workerCacheLock;
+	}
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -45,10 +52,10 @@ public class Worker : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-            await judgeService.EnsureLoggedinAsync();
+            _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+            await _judgeService.EnsureLoggedinAsync();
 
-            var ws = await judgeService.ConsumeWebSocketAsync(stoppingToken);
+            var ws = await _judgeService.ConsumeWebSocketAsync(stoppingToken);
 
             while (ws.State == WebSocketState.Open)
             {
@@ -64,7 +71,7 @@ public class Worker : BackgroundService
                     await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, stoppingToken);
                 }
 
-                logger.LogInformation("Message received: {message}", message);
+                _logger.LogInformation("Message received: {message}", message);
 
                 if (!TryParseMessageDto(message, out var messageDto))
                 {
@@ -91,7 +98,7 @@ public class Worker : BackgroundService
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error processing for {runId} {language} {problemId} {domainId}",
+            _logger.LogError(ex, "Error processing for {runId} {language} {problemId} {domainId}",
                 messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId);
 
             await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new JudgeProcessResponse
@@ -115,7 +122,7 @@ public class Worker : BackgroundService
             Status = JudgeStatus.STATUS_COMPILING,
         })), WebSocketMessageType.Text, true, stoppingToken);
 
-        var compileResult = await sandboxService.CompileAsync(messageDto.Code, messageDto.RunId, messageDto.Language);
+        var compileResult = await _sandboxService.CompileAsync(messageDto.Code, messageDto.RunId, messageDto.Language);
 
         if (compileResult.Status == JudgeStatus.STATUS_ACCEPTED)
         {
@@ -140,7 +147,7 @@ public class Worker : BackgroundService
                 MemoryInKiloBytes = 0,
             })), WebSocketMessageType.Text, true, stoppingToken);
 
-            logger.LogInformation("Compile error for {runId} {language} {problemId} {domainId}",
+            _logger.LogInformation("Compile error for {runId} {language} {problemId} {domainId}",
                 messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId);
         }
     }
@@ -153,15 +160,15 @@ public class Worker : BackgroundService
         long totalTime = 0;
         await foreach (TestCase testCase in this.GetTestCasesAsync(messageDto))
         {
-            logger.LogInformation("Running test case {TestCaseNumber}", testCase.CaseNumber);
+            _logger.LogInformation("Running test case {TestCaseNumber}", testCase.CaseNumber);
 
-            var testCaseResult = await sandboxService.RunAsync(testCase, compileResult);
+            var testCaseResult = await _sandboxService.RunAsync(testCase, compileResult);
 
             if (testCaseResult.Status.Equals(JudgeStatus.STATUS_ACCEPTED))
             {
-                this.logger.LogInformation("Validating test case {testCaseId} using {validatorType}", testCase.CaseNumber, testCase.ValidatorType);
-                testCaseResult = await this.validatorServices[((int)testCase.ValidatorType) - 1].ValidateAsync(testCase, testCaseResult);
-                this.logger.LogInformation("Validated test case {testCaseId} using {validatorType} {ProcessedTestCase}", testCase.CaseNumber, testCase.ValidatorType, true);
+                _logger.LogInformation("Validating test case {testCaseId} using {validatorType}", testCase.CaseNumber, testCase.ValidatorType);
+                testCaseResult = await _validatorServices[((int)testCase.ValidatorType) - 1].ValidateAsync(testCase, testCaseResult);
+                _logger.LogInformation("Validated test case {testCaseId} using {validatorType} {ProcessedTestCase}", testCase.CaseNumber, testCase.ValidatorType, true);
             }
 
             var testCaseResponse = new JudgeProcessResponse
@@ -199,9 +206,9 @@ public class Worker : BackgroundService
 
         await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(judgeProcessResponse)), WebSocketMessageType.Text, true, stoppingToken);
 
-        await this.sandboxService.DeleteFileAsync(compileResult.OutputFileId);
+        await _sandboxService.DeleteFileAsync(compileResult.OutputFileId);
 
-        logger.LogInformation("Graded problem for: {runId} {language} {problemId} {domainId} {ProcessedProblemSubmission}",
+        _logger.LogInformation("Graded problem for: {runId} {language} {problemId} {domainId} {ProcessedProblemSubmission}",
                                    messageDto.RunId, messageDto.Language, messageDto.ProblemId, messageDto.DomainId, true);
     }
 
@@ -209,9 +216,9 @@ public class Worker : BackgroundService
     {
         if (messageDto.Type == JudgeProcessRequestType.Pretest)
         {
-            return this.judgeService.GetPretestCasesAsync(messageDto.RunId);
+            return _judgeService.GetPretestCasesAsync(messageDto.RunId);
         }
-        return problemService.GetTestCasesAsync(messageDto.ProblemId, messageDto.DomainId);
+        return _problemService.GetTestCasesAsync(messageDto.ProblemId, messageDto.DomainId);
     }
 
     private static bool TryParseMessageDto(string message, out JudgeProcessRequest? messageDto)
@@ -230,28 +237,41 @@ public class Worker : BackgroundService
 
     private async Task UpdateProblemDataAsync()
     {
-        await judgeService.EnsureLoggedinAsync();
-        int lastUpdateAt = await cacheService.GetCacheUpdateTimeAsync();
-        var dataList = await judgeService.GetDataListAsync(lastUpdateAt);
-        if (dataList == null || dataList.Problems == null)
+        _logger.LogInformation("Inside UpdateProblemDataAsync");
+        _logger.LogInformation("Waiting for workerCacheLock");
+        await _workerCacheLock.WaitAsync();
+        try
         {
-            logger.LogInformation("No problem data updated");
-            return;
-        }
-        foreach (var problem in dataList.Problems)
-        {
-            string problemId = problem.ProblemId.ToString()!;
-            logger.LogInformation("Problem {problemId} updated at {domainId}", problemId, problem.DomainId);
-            var zipData = await judgeService.GetProblemDataAsync(problemId, problem.DomainId);
-            if (zipData == null)
+            await _judgeService.EnsureLoggedinAsync();
+            int lastUpdateAt = await _cacheService.GetCacheUpdateTimeAsync();
+            var dataList = await _judgeService.GetDataListAsync(lastUpdateAt);
+            if (dataList == null || dataList.Problems == null)
             {
-                logger.LogError("Problem data not found for {problemid}, {domainId}", problemId, problem.DomainId);
-                continue;
+                _logger.LogInformation("No problem data updated");
+                return;
+            }
+            foreach (var problem in dataList.Problems)
+            {
+                string problemId = problem.ProblemId.ToString()!;
+                _logger.LogInformation("Problem {problemId} updated at {domainId}", problemId, problem.DomainId);
+                var zipData = await _judgeService.GetProblemDataAsync(problemId, problem.DomainId);
+                if (zipData == null)
+                {
+                    _logger.LogError("Problem data not found for {problemid}, {domainId}", problemId, problem.DomainId);
+                    continue;
+                }
+
+                await _cacheService.InvalidateCacheAsync(problem.DomainId, problemId);
+
+                _cacheService.WriteCache(zipData, problem.DomainId, problemId);
             }
 
-            await cacheService.InvalidateCacheAsync(problem.DomainId, problemId);
-
-            await cacheService.WriteCacheAsync(zipData, problem.DomainId, problemId, dataList.UnixTimestamp);
+            await _cacheService.UpdateCacheTimeAsync(dataList.UnixTimestamp);
+        }
+        finally
+        {
+            _logger.LogInformation("Releasing workerCacheLock");
+            _workerCacheLock.Release();
         }
     }
 }

@@ -10,5 +10,7 @@ public interface ICacheService
 
     Task<int> GetCacheUpdateTimeAsync();
 
-    Task WriteCacheAsync(ZipArchive zipData, string domainId, string problemId, int unixTimestamp);
+    void WriteCache(ZipArchive zipData, string domainId, string problemId);
+
+    Task UpdateCacheTimeAsync(int unixTimestamp);
 }

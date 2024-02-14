@@ -10,8 +10,13 @@ using Sojj.Services.Contracts;
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
-        services.AddHostedService<Worker>();
-        services.AddSingleton<IJudgeService, JudgeService>();
+        int numWorkers = context.Configuration.GetValue<int>("NumberOfWorkers", 1);
+        services.AddKeyedSingleton("workerCacheLock", new SemaphoreSlim(1, 1));
+        for (int i = 0; i < numWorkers; i++)
+        {
+			services.AddSingleton<IHostedService, Worker>();
+		}
+        services.AddScoped<IJudgeService, JudgeService>();
         services.AddSingleton<ICacheService, CacheService>();
         services.AddSingleton<IProblemService, ProblemServices>();
         services.AddSingleton<ISandboxService, SandboxService>();
