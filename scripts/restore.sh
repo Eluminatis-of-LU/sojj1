@@ -25,4 +25,4 @@ tar -xzf bflat-7.0.2-linux-glibc-x64.tar.gz -C /usr/local/bflat
 
 rm -rf bflat-7.0.2-linux-glibc-x64.tar.gz
 
-wget https://github.com/criyle/go-judge/releases/download/v1.8.0/go-judge_1.8.0_linux_amd64 -O /usr/bin/sandbox && chmod +x /usr/bin/sandbox
+wget https://github.com/criyle/go-judge/releases/download/v1.8.1/go-judge_1.8.1_linux_amd64 -O /usr/bin/sandbox && chmod +x /usr/bin/sandbox
