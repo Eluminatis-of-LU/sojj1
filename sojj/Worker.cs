@@ -18,6 +18,7 @@ public class Worker : BackgroundService
     private readonly IProblemService _problemService;
     private readonly List<IValidatorService> _validatorServices;
 	private readonly SemaphoreSlim _workerCacheLock;
+	private readonly Guid _workerId;
 
 	public Worker(ILogger<Worker> logger,
         ICacheService cacheService,
@@ -40,6 +41,8 @@ public class Worker : BackgroundService
             throw new Exception("Not all validator registered");
         }
         _workerCacheLock = workerCacheLock;
+        LogContext.PushProperty("WorkerId", _workerId = Guid.NewGuid());
+        _logger.LogInformation("Worker created with id {WorkerId}", _workerId);
 	}
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -79,11 +82,9 @@ public class Worker : BackgroundService
                     continue;
                 }
 
-                GlobalLogContext.PushProperty("CorrelationId", Guid.NewGuid());
-                GlobalLogContext.PushProperty("runId", messageDto!.RunId);
+                LogContext.PushProperty("CorrelationId", Guid.NewGuid());
+                LogContext.PushProperty("runId", messageDto!.RunId);
                 await TryProcessMessageAsync(messageDto, ws, stoppingToken);
-                GlobalLogContext.PushProperty("runId", null);
-                GlobalLogContext.PushProperty("CorrelationId", null);
             }
 
             await Task.Delay(1000, stoppingToken);
