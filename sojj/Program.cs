@@ -29,6 +29,8 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IValidatorService, LineValidatorService>();
         services.AddSingleton<IValidatorService, FloatValidatorService>();
         services.AddSingleton<IValidatorService, CustomValidatorService>();
+        services.AddSingleton<JudgeServiceHealthCheck>();
+        services.AddSingleton<SandboxServiceHealthCheck>();
 
         services.AddHealthChecks()
             .AddCheck<JudgeServiceHealthCheck>("JudgeServiceHealthCheck")
