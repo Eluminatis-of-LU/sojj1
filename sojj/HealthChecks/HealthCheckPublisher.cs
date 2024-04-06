@@ -39,6 +39,7 @@ public class HealthCheckPublisher : IHealthCheckPublisher
 
         File.Create(_healthCheckFilePath).Dispose();
 
+        return;
         var response = await httpClient.GetAsync(string.Empty, cancellationToken);
 
         if (response.IsSuccessStatusCode)
