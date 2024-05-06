@@ -27,6 +27,6 @@ tar -xzf bflat-${BFLAT_VERSION}-linux-glibc-x64.tar.gz -C /usr/local/bflat
 
 rm -rf bflat-${BFLAT_VERSION}-linux-glibc-x64.tar.gz
 
-GO_JUDGE_VERSION=1.8.3
+GO_JUDGE_VERSION=1.8.4
 
 wget https://github.com/criyle/go-judge/releases/download/v${GO_JUDGE_VERSION}/go-judge_${GO_JUDGE_VERSION}_linux_amd64 -O /usr/bin/sandbox && chmod +x /usr/bin/sandbox
