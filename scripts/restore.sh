@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/bin/bash
+
+set -e
 
 apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -14,6 +16,9 @@ apt-get update && \
 		ruby \
 		golang \
 		openjdk-8-jdk-headless \
+        curl \
+		unzip \
+        zip
 
 BFLAT_VERSION=7.0.2
 
@@ -29,7 +34,7 @@ rm -rf bflat-${BFLAT_VERSION}-linux-glibc-x64.tar.gz
 
 curl -s "https://get.sdkman.io" | bash
 
-source ~/.sdkman/bin/sdkman-init.sh
+source "/root/.sdkman/bin/sdkman-init.sh"
 
 sdk install kotlin
 
