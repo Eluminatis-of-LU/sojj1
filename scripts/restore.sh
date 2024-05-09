@@ -13,7 +13,8 @@ apt-get update && \
 		nodejs \
 		ruby \
 		golang \
-		openjdk-8-jdk-headless
+		openjdk-8-jdk-headless \
+		kotlin
 
 BFLAT_VERSION=7.0.2
 

@@ -82,5 +82,12 @@
     "codeFile": "foo.go",
     "outputFile": "foo",
     "execute": ["foo"]
+  },
+  "kt": {
+    "type": "compiler",
+    "compile": ["kotlinc", "foo.kt", "-include-runtime", "-d", "foo.jar"],
+    "codeFile": "foo.kt",
+    "outputFile": "foo.jar",
+    "execute": ["java", "-jar", "foo.jar"]
   }
 }
