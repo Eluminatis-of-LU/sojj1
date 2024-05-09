@@ -16,9 +16,9 @@ apt-get update && \
 		ruby \
 		golang \
 		openjdk-8-jdk-headless \
-                curl \
+        curl \
 		unzip \
-                zip
+        zip
 
 BFLAT_VERSION=7.0.2
 
