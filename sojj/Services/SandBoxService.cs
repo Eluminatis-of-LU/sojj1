@@ -82,6 +82,7 @@ public class SandboxService : ISandboxService
         }
 
         logger.LogInformation("Language {language} found", language);
+        long timeLimitInNs = (languageInfo.CpuLimit ?? this.cpuLimitForRuns) * Constants.NanoSecondInSecond;
         var request = new SandboxRunRequest
         {
             Commands =
@@ -107,8 +108,8 @@ public class SandboxService : ISandboxService
                                 Max = this.outputLimitForRuns * Constants.ByteInKiloByte,
                             },
                         ],
-                        CpuLimit = this.cpuLimitForRuns * Constants.NanoSecondInSecond,
-                        ClockLimit = (this.cpuLimitForRuns * Constants.NanoSecondInSecond) * 3,
+                        CpuLimit = timeLimitInNs,
+                        ClockLimit = timeLimitInNs * 3,
                         MemoryLimit = this.memoryLimitForRuns * Constants.ByteInMegaByte,
                         ProcessLimit = this.processLimitForRuns,
                         CopyIn = new Dictionary<string, SandboxFile>
