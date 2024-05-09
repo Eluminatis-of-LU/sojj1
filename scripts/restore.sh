@@ -14,7 +14,6 @@ apt-get update && \
 		ruby \
 		golang \
 		openjdk-8-jdk-headless \
-		kotlin
 
 BFLAT_VERSION=7.0.2
 
@@ -27,6 +26,12 @@ mkdir -p /usr/local/bflat
 tar -xzf bflat-${BFLAT_VERSION}-linux-glibc-x64.tar.gz -C /usr/local/bflat
 
 rm -rf bflat-${BFLAT_VERSION}-linux-glibc-x64.tar.gz
+
+curl -s "https://get.sdkman.io" | bash
+
+source ~/.sdkman/bin/sdkman-init.sh
+
+sdk install kotlin
 
 GO_JUDGE_VERSION=1.8.4
 
