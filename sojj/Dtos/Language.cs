@@ -18,4 +18,7 @@ public class Language
 
     [JsonPropertyName("execute")]
     public string[]? Execute { get; set; }
+
+    [JsonPropertyName("cpuLimit")]
+    public long? CpuLimit { get; set; }
 }
