@@ -14,18 +14,26 @@ RUN dotnet build "sojj.csproj" -c Release -o /app/build
 FROM build AS publish
 RUN dotnet publish "sojj.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-FROM base AS final
+FROM base AS prepare-languages
+WORKDIR /app
+
+COPY ./scripts/restore/restore-from-apt.sh /root/scripts/restore/restore-from-apt.sh
+RUN chmod +x /root/scripts/restore/restore-from-apt.sh
+RUN /root/scripts/restore/restore-from-apt.sh
+
+COPY ./scripts/restore /root/scripts/restore
+RUN chmod +x /root/scripts/restore/*.sh
+
+RUN /root/scripts/restore/restore.sh
+
+FROM prepare-languages AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-COPY ./scripts /root/scripts
-
-RUN chmod +x /root/scripts/*.sh
-
-RUN /root/scripts/restore.sh
-
 COPY ./entrypoint.sh /root/entrypoint.sh
+COPY ./sandbox.sh /root/sandbox.sh
 RUN chmod +x /root/entrypoint.sh
+RUN chmod +x /root/sandbox.sh
 
 EXPOSE 5050/tcp
 
