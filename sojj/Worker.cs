@@ -168,6 +168,7 @@ public class Worker : BackgroundService
             if (testCaseResult.Status.Equals(JudgeStatus.STATUS_ACCEPTED))
             {
                 _logger.LogInformation("Validating test case {testCaseId} using {validatorType}", testCase.CaseNumber, testCase.ValidatorType);
+                testCaseResult.Message = string.Empty;
                 testCaseResult = await _validatorServices[((int)testCase.ValidatorType) - 1].ValidateAsync(testCase, testCaseResult);
                 _logger.LogInformation("Validated test case {testCaseId} using {validatorType} {ProcessedTestCase}", testCase.CaseNumber, testCase.ValidatorType, true);
             }
