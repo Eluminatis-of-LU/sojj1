@@ -52,6 +52,7 @@ public class SandboxService : ISandboxService
         this.memoryLimitForRuns = this.configuration.GetValue<long>("MemoryLimitForRuns");
         this.cpuLimitForRuns = this.configuration.GetValue<long>("CpuLimitForRuns");
         this.outputLimitForRuns = this.configuration.GetValue<long>("OutputLimitForRuns");
+        this.stackLimitForRuns = this.configuration.GetValue<long>("StackLimitForRuns");
     }
 
     public async Task CheckHealthAsync()
@@ -111,6 +112,7 @@ public class SandboxService : ISandboxService
                         CpuLimit = timeLimitInNs,
                         ClockLimit = timeLimitInNs * 3,
                         MemoryLimit = this.memoryLimitForRuns * Constants.ByteInMegaByte,
+                        StackLimit = this.stackLimitForRuns * Constants.ByteInMegaByte,
                         ProcessLimit = this.processLimitForRuns,
                         CopyIn = new Dictionary<string, SandboxFile>
                         {

@@ -28,6 +28,9 @@ public class Command
     [JsonPropertyName("memoryLimit")]
     public long? MemoryLimit { get; set; }
 
+    [JsonPropertyName("stackLimit")]
+    public long? StackLimit { get; set; }
+
     [JsonPropertyName("procLimit")]
     public int? ProcessLimit { get; set; }
 
