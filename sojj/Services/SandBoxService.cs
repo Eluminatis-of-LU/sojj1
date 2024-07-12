@@ -24,6 +24,8 @@ public class SandboxService : ISandboxService
     private readonly long cpuLimitForRuns;
     private readonly long outputLimitForRuns;
 
+    private readonly long stackLimitForRuns;
+
     public SandboxService(ILogger<SandboxService> logger, IConfiguration configuration)
     {
         this.logger = logger;
