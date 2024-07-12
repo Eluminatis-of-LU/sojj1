@@ -232,6 +232,7 @@ public class SandboxService : ISandboxService
                         ],
                         CpuLimit = testCase.TimeLimit,
                         ClockLimit = testCase.TimeLimit * 3,
+                        StackLimit = this.stackLimitForRuns * Constants.ByteInMegaByte,
                         MemoryLimit = testCase.MemoryLimit,
                         ProcessLimit = this.processLimitForRuns,
                         CopyIn = copyIn,
