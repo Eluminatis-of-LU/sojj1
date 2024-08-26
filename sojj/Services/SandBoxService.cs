@@ -157,6 +157,9 @@ public class SandboxService : ISandboxService
 
         var compileResult = result[0];
 
+        logger.LogInformation("Compilation used, cpu: {compileTime}ms wall: {compileRunTime}ms using memory: {compileMemory}mb", 
+            compileResult.Time / Constants.NanoSecondInMillisecond, compileResult.RunTime / / Constants.NanoSecondInMillisecond, compileResult.Memory / Constants.ByteInMegaByte);
+
         if (compileResult.Status != Constants.Accepted)
         {
             logger.LogError("Compile failed: {status}", compileResult.Status);
@@ -167,7 +170,7 @@ public class SandboxService : ISandboxService
             };
         }
 
-        logger.LogInformation("Compile success");
+        logger.LogInformation("Compile success");        
 
         foreach (var file in compileResult.FileIds)
         {
