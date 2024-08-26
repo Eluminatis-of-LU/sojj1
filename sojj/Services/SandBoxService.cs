@@ -158,7 +158,7 @@ public class SandboxService : ISandboxService
         var compileResult = result[0];
 
         logger.LogInformation("Compilation used, cpu: {compileTime}ms wall: {compileRunTime}ms using memory: {compileMemory}mb", 
-            compileResult.Time / Constants.NanoSecondInMillisecond, compileResult.RunTime / / Constants.NanoSecondInMillisecond, compileResult.Memory / Constants.ByteInMegaByte);
+            compileResult.Time / Constants.NanoSecondInMillisecond, compileResult.RunTime / Constants.NanoSecondInMillisecond, compileResult.Memory / Constants.ByteInMegaByte);
 
         if (compileResult.Status != Constants.Accepted)
         {
