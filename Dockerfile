@@ -7,7 +7,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0-noble AS build
 WORKDIR /src
 COPY ["sojj/sojj.csproj", "sojj/"]
 RUN dotnet restore "sojj/sojj.csproj"
-COPY . .
+COPY sojj/* sojj/
 WORKDIR "/src/sojj"
 RUN dotnet build "sojj.csproj" -c Release -o /app/build
 
