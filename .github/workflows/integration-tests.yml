@@ -19,6 +19,10 @@ jobs:
         dotnet-version: '8.x'
     - name: Run integration tests
       run: dotnet test --logger:"trx;LogFileName=\test-results\TestResults.xml"
+    - name: Bash script to copy test results
+      run: |
+        ls
+        ls \test-results
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
