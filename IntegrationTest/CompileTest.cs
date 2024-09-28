@@ -11,8 +11,6 @@ namespace IntegrationTests;
 [Collection("ContainerCollection")]
 public class CompileTest 
 {
-    private IFutureDockerImage _image;
-    private IContainer _container;
     private SandboxService _sandBoxSerivce;
 
     public CompileTest(ContainerFixture fixture)
