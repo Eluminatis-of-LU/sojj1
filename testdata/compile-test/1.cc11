@@ -1,0 +1,9 @@
+#include <cstdio>
+#include <iostream>
+
+int main() {
+  auto s = "Hello, world!\n";
+  printf("Hello, world!\n");
+  std::cout << "Hello, world!" << std::endl;
+  return 0;
+}
