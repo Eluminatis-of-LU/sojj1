@@ -22,10 +22,10 @@ jobs:
     - name: Bash script to copy test results
       run: |
         ls
-        ls .\test-results
+        ls test-results
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
         files: |
-          .\test-results\TestResults.xml
+          test-results/**/*.xml
