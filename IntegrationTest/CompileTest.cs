@@ -8,52 +8,17 @@ using Sojj.Services;
 
 namespace IntegrationTests;
 
-public class CompileTest: IAsyncLifetime 
+[Collection("ContainerCollection")]
+public class CompileTest 
 {
-    
     private IFutureDockerImage _image;
     private IContainer _container;
     private SandboxService _sandBoxSerivce;
 
-    public async Task DisposeAsync()
+    public CompileTest(ContainerFixture fixture)
     {
-        await _container.StopAsync();
+        _sandBoxSerivce = fixture.SandBoxSerivce;
     }
-
-    public async Task InitializeAsync()
-    {
-        _image = new ImageFromDockerfileBuilder()
-            .WithName("sojj1-integration-test")
-            .WithDockerfileDirectory(CommonDirectoryPath.GetSolutionDirectory(), string.Empty)
-            .WithDockerfile("Dockerfile")
-            .Build();
-        await _image.CreateAsync().ConfigureAwait(false);
-        _container = new ContainerBuilder()
-            .WithImage(_image)
-            .WithPortBinding(5050, true)
-            .WithEntrypoint("/bin/bash", "-c", "/usr/bin/sandbox -http-addr 0.0.0.0:5050 -dir ~/sandbox/ -release -file-timeout 30m")
-            .WithPrivileged(true)
-            .Build();
-        await _container.StartAsync();
-        
-        int port = _container.GetMappedPublicPort(5050);
-        var logger = NSubstitute.Substitute.For<ILogger<SandboxService>>();
-        var inMemorySettings = new Dictionary<string, string> {
-            {"SandboxUrl", $"http://localhost:{port}"},
-            {"LanguageFilePath", "languages.json"},
-            {"SandboxEnvironment:0", "PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/bflat"},
-            {"CpuLimitForRuns", "15"},
-            {"MemoryLimitForRuns", "1024"},
-            {"StackLimitForRuns", "256"},
-            {"ProcessLimitForRuns", "20"},
-            {"OutputLimitForRuns", "5"}
-        };
-        IConfiguration config = new ConfigurationBuilder()
-            .AddInMemoryCollection(inMemorySettings)
-            .Build();
-        _sandBoxSerivce = new SandboxService(logger, config);
-    }
-
     [Fact]
     public async Task CheckHealthAsync()
     {
