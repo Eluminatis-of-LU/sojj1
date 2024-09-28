@@ -73,4 +73,44 @@ public class CompileTest
         var result = await _sandBoxSerivce.CompileAsync(sourceCode, Guid.NewGuid().ToString(), "py3");
         Assert.Equal(JudgeStatus.STATUS_ACCEPTED, result.Status);
     }
+
+    [Fact]
+    public async Task CompileJava()
+    {
+        string sourceCode = "public class Main { public static void main(String[] args) { System.out.println(\"Hello, World!\"); } }";
+        var result = await _sandBoxSerivce.CompileAsync(sourceCode, Guid.NewGuid().ToString(), "java");
+        Assert.Equal(JudgeStatus.STATUS_ACCEPTED, result.Status);
+    }
+
+    [Fact]
+    public async Task CompileJS()
+    {
+        string sourceCode = "console.log('Hello, World!')";
+        var result = await _sandBoxSerivce.CompileAsync(sourceCode, Guid.NewGuid().ToString(), "js");
+        Assert.Equal(JudgeStatus.STATUS_ACCEPTED, result.Status);
+    }
+    
+    [Fact]
+    public async Task CompileCSharp()
+    {
+        string sourceCode = "using System; class Program { static void Main() { Console.WriteLine(\"Hello, World!\"); } }";
+        var result = await _sandBoxSerivce.CompileAsync(sourceCode, Guid.NewGuid().ToString(), "cs");
+        Assert.Equal(JudgeStatus.STATUS_ACCEPTED, result.Status);
+    }
+
+    [Fact]
+    public async Task CompileRuby()
+    {
+        string sourceCode = "puts 'Hello, World!'";
+        var result = await _sandBoxSerivce.CompileAsync(sourceCode, Guid.NewGuid().ToString(), "ruby");
+        Assert.Equal(JudgeStatus.STATUS_ACCEPTED, result.Status);
+    }
+
+    [Fact]
+    public async Task CompileKotlin()
+    {
+        string sourceCode = "fun main() { println(\"Hello, World!\") }";
+        var result = await _sandBoxSerivce.CompileAsync(sourceCode, Guid.NewGuid().ToString(), "kt");
+        Assert.Equal(JudgeStatus.STATUS_ACCEPTED, result.Status);
+    }
 }
