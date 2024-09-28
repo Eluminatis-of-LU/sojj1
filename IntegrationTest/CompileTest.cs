@@ -68,4 +68,44 @@ public class CompileTest: IAsyncLifetime
         var result = await _sandBoxSerivce.CompileAsync(sourceCode, Guid.NewGuid().ToString(), "c");
         Assert.Equal(JudgeStatus.STATUS_ACCEPTED, result.Status);
     }
+
+    [Fact]
+    public async Task CompileC11()
+    {
+        string sourceCode = "#include <stdio.h>\nint main() { printf(\"Hello, World!\"); return 0; }";
+        var result = await _sandBoxSerivce.CompileAsync(sourceCode, Guid.NewGuid().ToString(), "c11");
+        Assert.Equal(JudgeStatus.STATUS_ACCEPTED, result.Status);
+    }
+
+    [Fact]
+    public async Task CompileCC()
+    {
+        string sourceCode = "#include <cstdio>\nint main() { printf(\"Hello, World!\"); return 0; }";
+        var result = await _sandBoxSerivce.CompileAsync(sourceCode, Guid.NewGuid().ToString(), "cc");
+        Assert.Equal(JudgeStatus.STATUS_ACCEPTED, result.Status);
+    }
+
+    [Fact]
+    public async Task CompileCC11()
+    {
+        string sourceCode = "#include <cstdio>\nint main() { auto st = \"c++11\"; printf(\"Hello, World!\"); return 0; }";
+        var result = await _sandBoxSerivce.CompileAsync(sourceCode, Guid.NewGuid().ToString(), "cc11");
+        Assert.Equal(JudgeStatus.STATUS_ACCEPTED, result.Status);
+    }
+
+    [Fact]
+    public async Task CompileCC20()
+    {
+        string sourceCode = "#include <cstdio>\n#include <compare>\nint main() { int a = 91, b = 110; auto ans1 = a <=> b; printf(\"Hello, World!\"); return 0; }";
+        var result = await _sandBoxSerivce.CompileAsync(sourceCode, Guid.NewGuid().ToString(), "cc20");
+        Assert.Equal(JudgeStatus.STATUS_ACCEPTED, result.Status);
+    }
+
+    [Fact]
+    public async Task CompilePython3()
+    {
+        string sourceCode = "print('Hello, World!')";
+        var result = await _sandBoxSerivce.CompileAsync(sourceCode, Guid.NewGuid().ToString(), "py3");
+        Assert.Equal(JudgeStatus.STATUS_ACCEPTED, result.Status);
+    }
 }
