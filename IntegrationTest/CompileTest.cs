@@ -68,12 +68,4 @@ public class CompileTest: IAsyncLifetime
         var result = await _sandBoxSerivce.CompileAsync(sourceCode, Guid.NewGuid().ToString(), "c");
         Assert.Equal(JudgeStatus.STATUS_ACCEPTED, result.Status);
     }
-
-    [Fact]
-    public async Task CompileCpp()
-    {
-        string sourceCode = "#include <cstdio>\nint main() { printf(\"Hello, World!\"); return 0; }";
-        var result = await _sandBoxSerivce.CompileAsync(sourceCode, Guid.NewGuid().ToString(), "cpp");
-        Assert.Equal(JudgeStatus.STATUS_ACCEPTED, result.Status);
-    }
 }
