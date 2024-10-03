@@ -16,4 +16,5 @@ apt-get update && \
 		ruby \
 		golang \
 		openjdk-8-jdk-headless \
-		unzip
+		unzip \
+		rustc

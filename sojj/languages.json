@@ -90,5 +90,12 @@
     "outputFile": "foo.jar",
     "execute": ["java", "-jar", "foo.jar"],
     "cpuLimit": 25
+  },
+  "rust2021": {
+    "type": "compiler",
+    "compile": ["/usr/bin/rustc", "-O", "foo.rs", "-o", "foo"],
+    "codeFile": "foo.rs",
+    "outputFile": "foo",
+    "execute": ["./foo"]
   }
 }
