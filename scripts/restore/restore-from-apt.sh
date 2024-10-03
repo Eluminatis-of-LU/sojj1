@@ -17,6 +17,4 @@ apt-get update && \
 		golang \
 		openjdk-8-jdk-headless \
 		unzip \
-		rustup
-
- rustup default stable
+		rustc

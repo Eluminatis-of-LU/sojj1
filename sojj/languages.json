@@ -93,7 +93,7 @@
   },
   "rust2021": {
     "type": "compiler",
-    "compile": ["/usr/bin/rustc", "foo.rs", "-o", "foo"],
+    "compile": ["/usr/bin/rustc", "-O", "foo.rs", "-o", "foo"],
     "codeFile": "foo.rs",
     "outputFile": "foo",
     "execute": ["./foo"]
