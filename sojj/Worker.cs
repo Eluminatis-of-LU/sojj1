@@ -199,7 +199,7 @@ public class Worker : BackgroundService
             totalMemory = Math.Max(totalMemory, testCaseResult.MemoryInByte);
             totalTime = Math.Max(totalTime, testCaseResult.TimeInNs);
 
-            failCount += !testCaseResult.Status.Equals(JudgeStatus.STATUS_ACCEPTED);
+            failCount += testCaseResult.Status.Equals(JudgeStatus.STATUS_ACCEPTED) ? 0 : 1;
 
             if (failCount > _testCaseFailLimit)
             {
