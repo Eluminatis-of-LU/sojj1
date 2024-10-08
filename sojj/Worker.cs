@@ -19,6 +19,7 @@ public class Worker : BackgroundService
     private readonly List<IValidatorService> _validatorServices;
 	private readonly SemaphoreSlim _workerCacheLock;
 	private readonly Guid _workerId;
+    private readonly int _testCaseFailLimit;
 
 	public Worker(ILogger<Worker> logger,
         ICacheService cacheService,
@@ -26,7 +27,8 @@ public class Worker : BackgroundService
         IProblemService problemService,
         IEnumerable<IValidatorService> validatorServices,
         [FromKeyedServices("workerCacheLock")] SemaphoreSlim workerCacheLock,
-		IServiceScopeFactory serviceScopeFactory)
+		IServiceScopeFactory serviceScopeFactory,
+        IConfiguration configuration)
 
 	{
         _logger = logger;
@@ -40,6 +42,7 @@ public class Worker : BackgroundService
         {
             throw new Exception("Not all validator registered");
         }
+        _testCaseFailLimit = configuration.GetValue<int>("TestCaseFailLimit");
         _workerCacheLock = workerCacheLock;
         LogContext.PushProperty("WorkerId", _workerId = Guid.NewGuid());
         _logger.LogInformation("Worker created with id {WorkerId}", _workerId);
@@ -159,6 +162,7 @@ public class Worker : BackgroundService
         int problemStatus = (int)JudgeStatus.STATUS_ACCEPTED;
         long totalMemory = 0;
         long totalTime = 0;
+        int failCount = 0;
         await foreach (TestCase testCase in this.GetTestCasesAsync(messageDto))
         {
             _logger.LogInformation("Running test case {TestCaseNumber}", testCase.CaseNumber);
@@ -194,6 +198,13 @@ public class Worker : BackgroundService
             problemStatus = Math.Max(problemStatus, (int)testCaseResult.Status);
             totalMemory = Math.Max(totalMemory, testCaseResult.MemoryInByte);
             totalTime = Math.Max(totalTime, testCaseResult.TimeInNs);
+
+            failCount += !testCaseResult.Status.Equals(JudgeStatus.STATUS_ACCEPTED)
+
+            if (failCount > _testCaseFailLimit)
+            {
+                break;
+            }
         }
 
         var judgeProcessResponse = new JudgeProcessResponse
