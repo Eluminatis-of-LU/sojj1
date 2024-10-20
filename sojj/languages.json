@@ -99,10 +99,10 @@
     "execute": ["./foo"]
   },
   "pypy3": {
-    "type": "interpreter",
+    "type": "compiler",
     "compile": ["pypy3", "-c", "import py_compile; py_compile.compile('foo.py', 'foo.pyc', doraise=True)"],
     "codeFile": "foo.py",
-    "outputFile": "foo.py",
-    "execute": ["pypy3", "foo.py"]
+    "outputFile": "foo.pyc",
+    "execute": ["pypy3", "foo.pyc"]
   }
 }
