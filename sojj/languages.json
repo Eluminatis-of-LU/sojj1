@@ -100,7 +100,7 @@
   },
   "pypy3": {
     "type": "interpreter",
-    "compile": ["true"],
+    "compile": ["pypy3", "-c", "import py_compile; py_compile.compile('foo.py', 'foo.pyc', doraise=True)"],
     "codeFile": "foo.py",
     "outputFile": "foo.py",
     "execute": ["pypy3", "foo.py"]

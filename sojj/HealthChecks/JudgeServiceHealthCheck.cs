@@ -11,12 +11,14 @@ namespace Sojj.HealthChecks;
 public class JudgeServiceHealthCheck : IHealthCheck
 {
     private readonly ILogger<JudgeServiceHealthCheck> _logger;
+    private readonly IServiceScope _serviceScope;
     private readonly IJudgeService _judgeService;
 
-    public JudgeServiceHealthCheck(ILogger<JudgeServiceHealthCheck> logger, IJudgeService judgeService)
+    public JudgeServiceHealthCheck(ILogger<JudgeServiceHealthCheck> logger, IServiceScopeFactory serviceScopeFactory)
     {
         _logger = logger;
-        _judgeService = judgeService;
+        _serviceScope = serviceScopeFactory.CreateScope();
+		_judgeService = _serviceScope.ServiceProvider.GetRequiredService<IJudgeService>();;
     }
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
