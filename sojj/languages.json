@@ -97,5 +97,12 @@
     "codeFile": "foo.rs",
     "outputFile": "foo",
     "execute": ["./foo"]
+  },
+  "pypy3": {
+    "type": "interpreter",
+    "compile": ["true"],
+    "codeFile": "foo.py",
+    "outputFile": "foo.py",
+    "execute": ["pypy3", "foo.py"]
   }
 }

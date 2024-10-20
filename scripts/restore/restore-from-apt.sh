@@ -17,4 +17,5 @@ apt-get update && \
 		golang \
 		openjdk-8-jdk-headless \
 		unzip \
-		rustc
+		rustc \
+		pypy3
