@@ -1,5 +1,5 @@
 #!/bin/bash
 
-/root/sandbox.sh
+/root/sandbox.sh &
 
 dotnet /app/Sojj.dll
