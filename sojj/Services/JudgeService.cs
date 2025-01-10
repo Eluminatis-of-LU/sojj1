@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Http;
-using Polly;
-using Polly.Extensions.Http;
 using Sojj.Dtos;
 using Sojj.Services.Contracts;
 using System.IO.Compression;
@@ -41,6 +39,26 @@ internal class JudgeService : IJudgeService
         wsUrl = new Uri(wsScheme + httpClient.BaseAddress.Host + ":" + httpClient.BaseAddress.Port + "/judge/consume-conn/websocket");
         ws = new ClientWebSocket();
         ws.Options.Cookies = socketHandler.CookieContainer;
+    }
+
+    public async Task<bool> CheckinAsync()
+    {
+        var formdata = new MultipartFormDataContent{
+            {new StringContent(Environment.MachineName), "name"},
+            {new StringContent(this.configuration.GetValue<int>("NumberOfWorkers", Environment.ProcessorCount).ToString()), "concurrency"},
+            {new StringContent(this.configuration.GetValue<string>("Version", "default")), "version"},
+        };
+        var response = await httpClient.PostAsync("/judge/checkin", formdata);
+        if (response.IsSuccessStatusCode)
+        {
+            logger.LogInformation("Checkin success");
+        }
+        else
+        {
+            logger.LogError("Checkin failed");
+        }
+
+        return response.IsSuccessStatusCode;
     }
 
     public async Task<ClientWebSocket> ConsumeWebSocketAsync(CancellationToken cancellationToken)

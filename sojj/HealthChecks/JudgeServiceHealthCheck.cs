@@ -26,6 +26,7 @@ public class JudgeServiceHealthCheck : IHealthCheck
         try
         {
             await _judgeService.EnsureLoggedinAsync();
+            await _judgeService.CheckinAsync();
         }
         catch (Exception ex)
         {

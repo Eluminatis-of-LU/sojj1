@@ -19,4 +19,6 @@ public interface IJudgeService
     Task<ClientWebSocket> ConsumeWebSocketAsync(CancellationToken cancellationToken);
 
     IAsyncEnumerable<TestCase> GetPretestCasesAsync(string runId);
+    
+    Task<bool> CheckinAsync();
 }
