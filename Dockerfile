@@ -1,4 +1,4 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+ARG GIT_SHA
 
 FROM mcr.microsoft.com/dotnet/runtime:8.0-noble AS base
 WORKDIR /app
@@ -37,6 +37,6 @@ RUN chmod +x /root/sandbox.sh
 
 EXPOSE 5050/tcp
 
-ENV JUDGER_VERSION="$(git describe --tags --always --dirty)"
+ENV JUDGER_VERSION=$GIT_SHA
 
 ENTRYPOINT [ "/root/entrypoint.sh" ]
