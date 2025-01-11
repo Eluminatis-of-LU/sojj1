@@ -1,5 +1,3 @@
-ARG GIT_SHA
-
 FROM mcr.microsoft.com/dotnet/runtime:8.0-noble AS base
 WORKDIR /app
 
@@ -37,6 +35,7 @@ RUN chmod +x /root/sandbox.sh
 
 EXPOSE 5050/tcp
 
+ARG GIT_SHA
 ENV JUDGER_VERSION=$GIT_SHA
 
 ENTRYPOINT [ "/root/entrypoint.sh" ]
