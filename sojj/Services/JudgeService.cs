@@ -46,7 +46,7 @@ internal class JudgeService : IJudgeService
         var formdata = new MultipartFormDataContent{
             {new StringContent(Environment.MachineName), "name"},
             {new StringContent(this.configuration.GetValue<int>("NumberOfWorkers", Environment.ProcessorCount).ToString()), "concurrency"},
-            {new StringContent(this.configuration.GetValue<string>("Version", "default")), "version"},
+            {new StringContent(this.configuration.GetValue<string>("JUDGER_VERSION", "default")), "version"},
         };
         var response = await httpClient.PostAsync("/judge/checkin", formdata);
         if (response.IsSuccessStatusCode)

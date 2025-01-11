@@ -37,4 +37,6 @@ RUN chmod +x /root/sandbox.sh
 
 EXPOSE 5050/tcp
 
+ENV JUDGER_VERSION="$(git describe --tags --always --dirty)"
+
 ENTRYPOINT [ "/root/entrypoint.sh" ]
