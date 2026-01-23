@@ -25,6 +25,7 @@ public class SandboxService : ISandboxService
     private readonly long outputLimitForRuns;
 
     private readonly long stackLimitForRuns;
+    private readonly double cpuLimitMultiplier;
 
     public SandboxService(ILogger<SandboxService> logger, IConfiguration configuration)
     {
@@ -55,6 +56,7 @@ public class SandboxService : ISandboxService
         this.cpuLimitForRuns = this.configuration.GetValue<long>("CpuLimitForRuns");
         this.outputLimitForRuns = this.configuration.GetValue<long>("OutputLimitForRuns");
         this.stackLimitForRuns = this.configuration.GetValue<long>("StackLimitForRuns");
+        this.cpuLimitMultiplier = this.configuration.GetValue<double>("CpuLimitMultiplier", 1.0);
     }
 
     public async Task CheckHealthAsync()
@@ -85,7 +87,7 @@ public class SandboxService : ISandboxService
         }
 
         logger.LogInformation("Language {language} found", language);
-        long timeLimitInNs = (languageInfo.CpuLimit ?? this.cpuLimitForRuns) * Constants.NanoSecondInSecond;
+        long timeLimitInNs = (long)((languageInfo.CpuLimit ?? this.cpuLimitForRuns) * Constants.NanoSecondInSecond * this.cpuLimitMultiplier);
         var request = new SandboxRunRequest
         {
             Commands =
@@ -233,8 +235,8 @@ public class SandboxService : ISandboxService
                                 Max = this.outputLimitForRuns * Constants.ByteInKiloByte,
                             },
                         ],
-                        CpuLimit = testCase.TimeLimit,
-                        ClockLimit = testCase.TimeLimit * 3,
+                        CpuLimit = (long)(testCase.TimeLimit * this.cpuLimitMultiplier),
+                        ClockLimit = (long)(testCase.TimeLimit * 3 * this.cpuLimitMultiplier),
                         StackLimit = this.stackLimitForRuns * Constants.ByteInMegaByte,
                         MemoryLimit = testCase.MemoryLimit,
                         ProcessLimit = this.processLimitForRuns,
@@ -291,7 +293,7 @@ public class SandboxService : ISandboxService
                 Message = runResult.Files[Constants.Stderr],
                 Score = 0,
                 MemoryInByte = runResult.Memory,
-                TimeInNs = runResult.Time,
+                TimeInNs = (long)(runResult.Time / this.cpuLimitMultiplier),
             };
         }
 
@@ -301,7 +303,7 @@ public class SandboxService : ISandboxService
         {
             Status = JudgeStatus.STATUS_ACCEPTED,
             Message = runResult.Files[Constants.Stderr],
-            TimeInNs = runResult.Time,
+            TimeInNs = (long)(runResult.Time / this.cpuLimitMultiplier),
             MemoryInByte = runResult.Memory,
             Score = testCase.Score,
             Output = runResult.Files[Constants.Stdout],
